@@ -1,12 +1,12 @@
 package com.thargoid;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
+//import edu.stanford.nlp.ling.CoreAnnotations;
+//import edu.stanford.nlp.ling.CoreLabel;
+//import edu.stanford.nlp.pipeline.Annotation;
+//import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+//import edu.stanford.nlp.util.CoreMap;
+//import com.opencsv.CSVReader;
+//import com.opencsv.CSVWriter;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
