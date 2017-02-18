@@ -1,12 +1,12 @@
 package com.thargoid;
 
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-import edu.stanford.nlp.util.CoreMap;
-import com.opencsv.CSVReader;
-import com.opencsv.CSVWriter;
+//import edu.stanford.nlp.ling.CoreAnnotations;
+//import edu.stanford.nlp.ling.CoreLabel;
+//import edu.stanford.nlp.pipeline.Annotation;
+//import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+//import edu.stanford.nlp.util.CoreMap;
+//import com.opencsv.CSVReader;
+//import com.opencsv.CSVWriter;
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -29,8 +29,21 @@ public class Main {
 
     public static void main(String[] args) {
 
-        WorkFolder = args[1];
-        if(args[2].equals("0"))
+        String[][] arguments = new String[5][2];
+        arguments[0][0] = "ProcessType";
+        arguments[0][1] = "0";
+        arguments[0][2] = "1";
+        arguments[1][0] = "WorkFolder";
+        arguments[1][1] = "1";
+        arguments[1][2] = "1";
+        arguments[2][0] = "LogToFile";
+        arguments[2][1] = "1";
+        arguments[2][2] = "1";
+        
+
+
+        WorkFolder = args[Integer.parseInt(arguments[1][1])];
+        if(args[Integer.parseInt(arguments[2][1])].equals("0"))
         {
             LogToFile = false;
         }
@@ -47,14 +60,14 @@ public class Main {
         }
         setup();
 
-        if(args[0].equals("1"))
+        if(args[Integer.parseInt(arguments[0][1])].equals("1"))
         {
             //lassoing rhetoric
 
 
         }
 
-        if(args[0].equals("2"))
+        if(args[Integer.parseInt(arguments[0][1])].equals("2"))
         {
             //iceni
         }
@@ -62,8 +75,6 @@ public class Main {
         log("Ending Tamesis");
 
     }
-
-
 
 
     static private void setup()
