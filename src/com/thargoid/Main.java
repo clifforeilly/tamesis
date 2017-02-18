@@ -26,10 +26,37 @@ public class Main {
     static private String LogFileName;
     static private String WorkFolder;
     static private String quando;
+    static private int AbstractArgCount;
+    static private String[][] arguments;
+    static private String[] args2;
+
+    static public String getArg(String arg)
+    {
+        String output = "No value set";
+        
+        for(int i = 0; i<AbstractArgCount; i++)
+        {
+            if(arguments[i][0].equals(arg))
+            {
+                if(args2.length>Integer.parseInt(arguments[i][1]))
+                {
+                    output = args2[Integer.parseInt(arguments[i][1])];
+                }
+                else
+                {
+                    output = arguments[i][2];
+                }
+            }
+        }
+        
+        return output;
+    }
 
     public static void main(String[] args) {
 
-        String[][] arguments = new String[5][2];
+        args2 = args;
+        AbstractArgCount = 3;
+        arguments = new String[AbstractArgCount][2];
         arguments[0][0] = "ProcessType";
         arguments[0][1] = "0";
         arguments[0][2] = "1";
@@ -42,8 +69,8 @@ public class Main {
         
 
 
-        WorkFolder = args[Integer.parseInt(arguments[1][1])];
-        if(args[Integer.parseInt(arguments[2][1])].equals("0"))
+        WorkFolder = getArg("WorkFolder");
+        if(getArg("LogToFile").equals("0"))
         {
             LogToFile = false;
         }
@@ -60,14 +87,14 @@ public class Main {
         }
         setup();
 
-        if(args[Integer.parseInt(arguments[0][1])].equals("1"))
+        if(getArg("ProcessType").equals("1"))
         {
             //lassoing rhetoric
 
 
         }
 
-        if(args[Integer.parseInt(arguments[0][1])].equals("2"))
+        if(getArg("ProcessType").equals("2"))
         {
             //iceni
         }
@@ -101,15 +128,19 @@ public class Main {
     {
         try
         {
-            try(Writer writer = new BufferedWriter
-                    (new OutputStreamWriter
-                            (new FileOutputStream(LogFileName, true), "utf-8")
-                    )
-                )
+            if(LogToFile)
             {
-                writer.write(getNow() + ":" + text + "\r");
-                System.out.println(getNow() + ":" + text);
+                try(Writer writer = new BufferedWriter
+                        (new OutputStreamWriter
+                                (new FileOutputStream(LogFileName, true), "utf-8")
+                        )
+                    )
+                {
+                    writer.write(getNow() + ":" + text + "\r");
+                }   
             }
+            System.out.println(getNow() + ":" + text);
+           
         }
         catch(Exception ex)
         {
