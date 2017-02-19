@@ -1,12 +1,6 @@
 package com.thargoid;
 
-//import edu.stanford.nlp.ling.CoreAnnotations;
-//import edu.stanford.nlp.ling.CoreLabel;
-//import edu.stanford.nlp.pipeline.Annotation;
-//import edu.stanford.nlp.pipeline.StanfordCoreNLP;
-//import edu.stanford.nlp.util.CoreMap;
-//import com.opencsv.CSVReader;
-//import com.opencsv.CSVWriter;
+
 
 import java.io.*;
 import java.text.SimpleDateFormat;
@@ -22,9 +16,9 @@ import java.util.Date;
 //3=processes to run:
     //1 - parse
     //2 - post-parse processing
-    //4 - framenet
-    //5 - lda
-    //6 - text markup, e.g. ontological
+    //3 - framenet
+    //4 - lda
+    //5 - text markup, e.g. ontological
     
 
 public class Main {
@@ -52,8 +46,6 @@ public class Main {
         arguments[2][0] = "LogToFile";
         arguments[2][1] = "1";
         arguments[2][2] = "1";
-        
-
 
         WorkFolder = getArg("WorkFolder");
         if(getArg("LogToFile").equals("0"))
@@ -73,21 +65,19 @@ public class Main {
         }
         setup();
 
-        if(getArg("ProcessType").equals("1"))
+        if(getArg("ProcessType").substring(getArg("ProcessType").length(), getArg("ProcessType").length()).equals("1"))
         {
-            //lassoing rhetoric
+            //parse
             Parse parse = new Parse(WorkFolder, "1", "1");
             parse.Execute();
             
 
         }
 
-        if(getArg("ProcessType").equals("2"))
+        if(getArg("ProcessType").substring(getArg("ProcessType").length()-1, getArg("ProcessType").length()-1).equals("1"))
         {
-            //iceni
-            Parse parse = new Parse(WorkFolder, "1", "1");
-            parse.Execute();
-            
+            //post-parse processing
+
             
         }
 
