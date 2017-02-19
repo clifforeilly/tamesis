@@ -19,6 +19,13 @@ import java.util.Date;
     //2=iceni
 //1=work folder
 //2=log to file (0 or 1)
+//3=processes to run:
+    //1 - parse
+    //2 - post-parse processing
+    //4 - framenet
+    //5 - lda
+    //6 - text markup, e.g. ontological
+    
 
 public class Main {
 
@@ -30,27 +37,6 @@ public class Main {
     static private String[][] arguments;
     static private String[] args2;
 
-    static public String getArg(String arg)
-    {
-        String output = "No value set";
-        
-        for(int i = 0; i<AbstractArgCount; i++)
-        {
-            if(arguments[i][0].equals(arg))
-            {
-                if(args2.length>Integer.parseInt(arguments[i][1]))
-                {
-                    output = args2[Integer.parseInt(arguments[i][1])];
-                }
-                else
-                {
-                    output = arguments[i][2];
-                }
-            }
-        }
-        
-        return output;
-    }
 
     public static void main(String[] args) {
 
@@ -90,13 +76,19 @@ public class Main {
         if(getArg("ProcessType").equals("1"))
         {
             //lassoing rhetoric
-
+            Parse parse = new Parse(WorkFolder, "1", "1");
+            parse.Execute();
+            
 
         }
 
         if(getArg("ProcessType").equals("2"))
         {
             //iceni
+            Parse parse = new Parse(WorkFolder, "1", "1");
+            parse.Execute();
+            
+            
         }
 
         log("Ending Tamesis");
@@ -146,6 +138,28 @@ public class Main {
         {
             System.out.println(ex.getMessage());
         }
+    }
+    
+    static public String getArg(String arg)
+    {
+        String output = "No value set";
+        
+        for(int i = 0; i<AbstractArgCount; i++)
+        {
+            if(arguments[i][0].equals(arg))
+            {
+                if(args2.length>Integer.parseInt(arguments[i][1]))
+                {
+                    output = args2[Integer.parseInt(arguments[i][1])];
+                }
+                else
+                {
+                    output = arguments[i][2];
+                }
+            }
+        }
+        
+        return output;
     }
 
 

@@ -20,6 +20,10 @@ public class Parse {
         //for each file in the \in folder run the parser
         //and save the files to the \parsed folder  
         
+        ParseFolder = "";
+        InputType = "";
+        OutputType = "";
+        
         return output;
     }
     
