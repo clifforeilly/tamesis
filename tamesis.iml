@@ -30,5 +30,39 @@
         <SOURCES />
       </library>
     </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
+          <root url="file://$MODULE_DIR$/../../Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/../../Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../../Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../Personal/MPhil/Tamesis/opencsv-3.9.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES />
+      </library>
+    </orderEntry>
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="jar://$MODULE_DIR$/../../Personal/MPhil/Tamesis/FrameNetAPI-0.4.2-bin-src.jar!/" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/../../Personal/MPhil/Tamesis/FrameNetAPI-0.4.2-bin-src.jar!/" />
+        </SOURCES>
+      </library>
+    </orderEntry>
   </component>
 </module>
