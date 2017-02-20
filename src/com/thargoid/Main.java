@@ -135,7 +135,7 @@ public class Main {
                     }
                     catch(Exception ex)
                     {
-                        log(ex.getMessage());
+                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
                     }
                     log("Ending Parse");
 
@@ -159,7 +159,7 @@ public class Main {
                     }
                     catch(Exception ex)
                     {
-                        log(ex.getMessage());
+                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
                     }
                     log("Ending Framenet");
                     break;
@@ -202,9 +202,7 @@ public class Main {
                     break;
 
             }
-
         }
-
 
         log("Ending Tamesis");
 
@@ -219,7 +217,7 @@ public class Main {
 
         String outputFolder = FramerFolder.replace(inFolder, "3_framed");
         inFolder = "3_framed";
-        Path p = Paths.get(FramerFolder);
+        Path p = Paths.get(outputFolder);
 
         try {
             if (Files.notExists(p)) {
@@ -241,19 +239,19 @@ public class Main {
                 }
             }
 
-            File f = new File(WorkFolder);
+            File f = new File(FramerFolder);
             File[] matchingFiles = f.listFiles(new FilenameFilter() {
                 @Override
                 public boolean accept(File dir, String name) {
                     return name.toLowerCase().endsWith(".csv");
                 }
             });
-            log("Scanned " + WorkFolder + " for csv files");
+            log("Scanned " + WorkFolder + " for csv files and found " + matchingFiles.length + " files");
 
             int filecount = 0;
-            String FrameNetFolder = "C:\\Users\\co17\\LocalStuff\\MyStuff\\Personal\\MPhil\\Framenet\\fndata-1.7\\fndata-1.7";
+            String FrameNetFolder = "C:\\Users\\co17\\LocalStuff\\MyStuff\\Personal\\MPhil\\Framenet\\fndata-1.5\\fndata-1.5";
             int luCol = 7;
-            int posCol = 4;
+            int posCol = 5;
 
             fn = new FrameNet();
             File fnHome = new File(FrameNetFolder);
@@ -268,14 +266,14 @@ public class Main {
                 {
                     String[] tmpLU = new String[3];
                     tmpLU[0]=luv.getLexemeString();
-                    tmpLU[1]=luv.getPartOfSpeechAbbreviation();
+                    tmpLU[1] = luv.getPartOfSpeechAbbreviation();
                     tmpLU[2]=fr.getName();
                     LUs.add(tmpLU);
                 }
             }
             log("Set up local LU List");
 
-            String[] row;
+
 
             int rowcount = 0;
             for(File tf : matchingFiles)
@@ -319,6 +317,7 @@ public class Main {
 
                     if(init)
                     {
+                        log("Attempting csv output - LU:" + tLU);
                         csvout.writeNext(writeFrameData(OutputType, colCount, frames, tLU, "False"));
                         rowcount++;
                         log("Written a row: " + rowcount);
@@ -355,7 +354,7 @@ public class Main {
         }
         catch(Exception ex)
         {
-            ex.printStackTrace();
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return output;
@@ -375,9 +374,7 @@ public class Main {
         }
         catch (Exception ex)
         {
-            System.out.println("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
         return outputFrameElements;
     }
@@ -395,9 +392,7 @@ public class Main {
         }
         catch (Exception ex)
         {
-            System.out.println("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-            ex.printStackTrace();
-
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
         return outputLUs;
     }
@@ -647,8 +642,7 @@ public class Main {
         }
         catch (Exception ex)
         {
-            System.out.println("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-            ex.printStackTrace();
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return rowout;
@@ -768,7 +762,7 @@ public class Main {
         }
         catch(Exception ex)
         {
-            ex.printStackTrace();
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return output;
@@ -815,8 +809,7 @@ public class Main {
         }
         catch (Exception ex)
         {
-            System.out.println("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-            ex.printStackTrace();
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return Louts;
@@ -833,7 +826,7 @@ public class Main {
         }
         catch (Exception ex)
         {
-            log(ex.getMessage());
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
 
@@ -862,7 +855,7 @@ public class Main {
         }
         catch(Exception ex)
         {
-            System.out.println(ex.getMessage());
+            System.out.println("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
     
