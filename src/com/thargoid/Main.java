@@ -35,7 +35,7 @@ import de.saar.coli.salsa.reiter.framenet.FrameNet;
     // inference (i)
     // e.g. pafgloi
 //4=delete files from each folder (0 or 1)
-
+//5
 
 public class Main {
 
