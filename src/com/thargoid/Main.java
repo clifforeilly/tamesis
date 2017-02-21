@@ -5,10 +5,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
+
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -30,10 +28,11 @@ import de.saar.coli.salsa.reiter.framenet.FrameNet;
     // post-parse processing (a)
     // framenet (f)
     // post-frame processing (g)
+    // wordnet (w)
     // lda (;)
     // text markup, e.g. ontological (o)
     // inference (i)
-    // e.g. pafgloi
+    // e.g. pafgwloi
 //4=delete files from each folder (0 or 1)
 //5
 
@@ -64,6 +63,8 @@ public class Main {
     static String[] prevRow;
     static String[] rowout;
     static String lastRow = "1";
+    static List<String[]> FrameColumns;
+    static int ColIDCount;
 
     public static void main(String[] args) {
 
@@ -164,6 +165,20 @@ public class Main {
                     log("Ending Framenet");
                     break;
 
+                case 'w':
+                    log("Starting WordNet");
+                    try {
+                        //wordnet
+                        //Framer ("1");
+                        WorkFolder = WorkFolder.replace(inFolder, "4_wordnet");
+                    }
+                    catch(Exception ex)
+                    {
+                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+                    }
+                    log("Ending WordNet");
+                    break;
+
                 case 'g':
 
                     //post-framenet processing
@@ -204,8 +219,46 @@ public class Main {
             }
         }
 
+        teardown();
         log("Ending Tamesis");
 
+    }
+
+    static private void setup()
+    {
+        try {
+            quando = getNow();
+            LogFileName = WorkFolder + File.separator + "log-" + quando + ".txt";
+            inFolder = "1_in";
+            FrameColumns = new ArrayList<String[]>();
+
+            String[] Cols = {"1", "Filename"};
+            FrameColumns.add(Cols);
+            ColIDCount = 1;
+
+            log("Finished setup");
+        }
+        catch (Exception ex)
+        {
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+        }
+    }
+
+    static private void teardown()
+    {
+        try {
+
+            for (String[] fc:FrameColumns)
+            {
+                   log("Columns exported: " + fc[0] + ": " + fc[1]);
+            }
+
+            log("Finished teardown");
+        }
+        catch (Exception ex)
+        {
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+        }
     }
 
 
@@ -318,7 +371,7 @@ public class Main {
                     if(init)
                     {
                         log("Attempting csv output - LU:" + tLU);
-                        csvout.writeNext(writeFrameData(OutputType, colCount, frames, tLU, "False"));
+                        csvout.writeNext(writeFrameData(OutputType, colCount, frames, tLU, "False", rowcount));
                         rowcount++;
                         log("Written a row: " + rowcount);
                     }
@@ -398,7 +451,7 @@ public class Main {
     }
 
 
-    static public String[] writeFrameData(String type, int colCount, List<String> frames, String tLU, String extraLine)
+    static public String[] writeFrameData(String type, int colCount, List<String> frames, String tLU, String extraLine, int rowcount)
     {
         //colCount = row.length + parsedColumns
         try
@@ -443,6 +496,10 @@ public class Main {
                     //add Frame name
                     rowout[a]=rowout[a] + " " + fr.getName();
                     a++;
+                        if(rowcount==0) {
+                            addColumnMetaData(String.valueOf(ColIDCount), "FrameNames");
+                            ColIDCount++;
+                        }
 
                     //add Frame Elements
                     String FEs = "";
@@ -453,6 +510,10 @@ public class Main {
                     FEs.trim();
                     rowout[a]=rowout[a] + " " + FEs;
                     a++;
+                        if(rowcount==0) {
+                            addColumnMetaData(String.valueOf(ColIDCount), "FrameElements");
+                            ColIDCount++;
+                        }
 
                     //add Frame LUs
                     String fLUs = "";
@@ -463,6 +524,10 @@ public class Main {
                     fLUs.trim();
                     rowout[a]=rowout[a] + " " + fLUs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "LexicalUnits");
+                        ColIDCount++;
+                    }
 
                     String ibFs = "";
                     for(Frame IdF : fr.isInheritedBy())
@@ -472,6 +537,10 @@ public class Main {
                     ibFs.trim();
                     rowout[a]=rowout[a] + " " + ibFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "IsInheritedBy");
+                        ColIDCount++;
+                    }
 
                     String pFs = "";
                     for(Frame IdF : fr.perspectivized())
@@ -481,6 +550,11 @@ public class Main {
                     pFs.trim();
                     rowout[a]=rowout[a] + " " + pFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Perspectivized");
+                        ColIDCount++;
+                    }
+
 
                     String uFs = "";
                     for(Frame IdF : fr.uses())
@@ -490,6 +564,10 @@ public class Main {
                     uFs.trim();
                     rowout[a]=rowout[a] + " " + uFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Uses");
+                        ColIDCount++;
+                    }
 
                     String ubFs = "";
                     for(Frame IdF : fr.usedBy())
@@ -499,6 +577,10 @@ public class Main {
                     ubFs.trim();
                     rowout[a]=rowout[a] + " " + ubFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "UserBy");
+                        ColIDCount++;
+                    }
 
                     String hsfFs = "";
                     for(Frame IdF : fr.hasSubframe())
@@ -508,6 +590,10 @@ public class Main {
                     hsfFs.trim();
                     rowout[a]=rowout[a] + " " + hsfFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "hasSubFrame");
+                        ColIDCount++;
+                    }
 
                     String incFs = "";
                     for(Frame IdF : fr.inchoative())
@@ -517,6 +603,10 @@ public class Main {
                     incFs.trim();
                     rowout[a]=rowout[a] + " " + incFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Inchoative");
+                        ColIDCount++;
+                    }
 
                     String incsFs = "";
                     for(Frame IdF : fr.inchoativeStative())
@@ -526,6 +616,10 @@ public class Main {
                     incsFs.trim();
                     rowout[a]=rowout[a] + " " + incsFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "InchoativeStative");
+                        ColIDCount++;
+                    }
 
                     String cauFs = "";
                     for(Frame IdF : fr.causative())
@@ -535,6 +629,10 @@ public class Main {
                     cauFs.trim();
                     rowout[a]=rowout[a] + " " + cauFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Causative");
+                        ColIDCount++;
+                    }
 
                     String caustFs = "";
                     for(Frame IdF : fr.causativeStative())
@@ -544,6 +642,10 @@ public class Main {
                     caustFs.trim();
                     rowout[a]=rowout[a] + " " + caustFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "CausativeStative");
+                        ColIDCount++;
+                    }
 
                     String aifFs = "";
                     for(Frame IdF : fr.allInheritedFrames())
@@ -553,6 +655,10 @@ public class Main {
                     aifFs.trim();
                     rowout[a]=rowout[a] + " " + aifFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "AllInheritedFrames");
+                        ColIDCount++;
+                    }
 
                     String aigfFs = "";
                     for(Frame IdF : fr.allInheritingFrames())
@@ -562,6 +668,10 @@ public class Main {
                     aigfFs.trim();
                     rowout[a]=rowout[a] + " " + aigfFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "AllInheritedFrames");
+                        ColIDCount++;
+                    }
 
                     String earFs = "";
                     for(Frame IdF : fr.earlier())
@@ -571,6 +681,10 @@ public class Main {
                     earFs.trim();
                     rowout[a]=rowout[a] + " " + earFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Earlier");
+                        ColIDCount++;
+                    }
 
                     String ifFs = "";
                     for(Frame IdF : fr.inheritsFrom())
@@ -580,6 +694,10 @@ public class Main {
                     ifFs.trim();
                     rowout[a]=rowout[a] + " " + ifFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "InheritsFrom");
+                        ColIDCount++;
+                    }
 
                     String lFs = "";
                     for(Frame IdF : fr.later())
@@ -589,6 +707,10 @@ public class Main {
                     lFs.trim();
                     rowout[a]=rowout[a] + " " + lFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Later");
+                        ColIDCount++;
+                    }
 
                     String nFs = "";
                     for(Frame IdF : fr.neutral())
@@ -598,6 +720,10 @@ public class Main {
                     nFs.trim();
                     rowout[a]=rowout[a] + " " + nFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Neutral");
+                        ColIDCount++;
+                    }
 
                     String refFs = "";
                     for(Frame IdF : fr.referred())
@@ -607,6 +733,10 @@ public class Main {
                     refFs.trim();
                     rowout[a]=rowout[a] + " " + refFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Referred");
+                        ColIDCount++;
+                    }
 
                     String refrFs = "";
                     for(Frame IdF : fr.referring())
@@ -616,6 +746,10 @@ public class Main {
                     refrFs.trim();
                     rowout[a]=rowout[a] + " " + refrFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "Referring");
+                        ColIDCount++;
+                    }
 
                     String sfoFs = "";
                     for(Frame IdF : fr.subframeOf())
@@ -625,6 +759,10 @@ public class Main {
                     sfoFs.trim();
                     rowout[a]=rowout[a] + " " + sfoFs;
                     a++;
+                    if(rowcount==0) {
+                        addColumnMetaData(String.valueOf(ColIDCount), "subFrameOf");
+                        ColIDCount++;
+                    }
 
                     if(extraLine.equals("True"))
                     {
@@ -782,8 +920,23 @@ public class Main {
             for(CoreMap sentence : sentences)
             {
                 s++;
-
                 int w=0;
+
+                addColumnMetaData(String.valueOf(ColIDCount), "SentenceNumber");
+                ColIDCount++;
+                addColumnMetaData(String.valueOf(ColIDCount), "WordNumber");
+                ColIDCount++;
+                addColumnMetaData(String.valueOf(ColIDCount), "OriginalWord");
+                ColIDCount++;
+                addColumnMetaData(String.valueOf(ColIDCount), "POSCode");
+                ColIDCount++;
+                addColumnMetaData(String.valueOf(ColIDCount), "POSType");
+                ColIDCount++;
+                addColumnMetaData(String.valueOf(ColIDCount), "NamedEntity");
+                ColIDCount++;
+                addColumnMetaData(String.valueOf(ColIDCount), "Lemma");
+                ColIDCount++;
+
                 for(CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class))
                 {
                     outs = new String[NumParsedColumns];
@@ -815,20 +968,13 @@ public class Main {
         return Louts;
     }
 
-
-    static private void setup()
+    static void addColumnMetaData(String COlID, String Description)
     {
-        try {
-            quando = getNow();
-            LogFileName = WorkFolder + File.separator + "log-" + quando + ".txt";
-            inFolder = "1_in";
-            log("Finished setup");
-        }
-        catch (Exception ex)
-        {
-            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-        }
+        String[] Cols = {COlID, Description};
+        FrameColumns.add(Cols);
+        ColIDCount++;
     }
+
 
     static String getNow()
     {
