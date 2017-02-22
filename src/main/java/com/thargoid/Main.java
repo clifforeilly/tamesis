@@ -1094,51 +1094,49 @@ public class Main {
                 int wc1 = 0;
                 for(String w : words)
                 {
-                    wc++;
-                    wc1++;
-                    w = w.replace(":", "");
-                    w = w.replace(";", "");
-                    w = w.replace(",", "");
-                    w = w.replace(".", "");
-                    w = w.replace("?", "");
-                    String wn = "w" + wc;
-                    String wp = "w" + Integer.toString(wc-1);
-                    String we = "w" + Integer.toString(wc+1);
-                    model.addIndividual("Gate", "word", wn);
-                    model.addObjectProperty("DocStruct", "hasWord", sn, wn);
-                    model.addDatatypeProperty("Gate", "hasString", wn, String.valueOf(w), "str");
+                    if(w.length()>0) {
+                        wc++;
+                        wc1++;
+                        w = w.replace(":", "");
+                        w = w.replace(";", "");
+                        w = w.replace(",", "");
+                        w = w.replace(".", "");
+                        w = w.replace("?", "");
+                        w = w.replace("(", "");
+                        w = w.replace(")", "");
+                        String wn = "w" + wc;
+                        String wp = "w" + Integer.toString(wc - 1);
+                        String we = "w" + Integer.toString(wc + 1);
+                        model.addIndividual("Gate", "word", wn);
+                        model.addObjectProperty("DocStruct", "hasWord", sn, wn);
+                        model.addDatatypeProperty("Gate", "hasString", wn, String.valueOf(w), "str");
 
-                    id++;
-                    model.addDatatypeProperty("Gate", "hasID", wn, String.valueOf(id), "int");
+                        id++;
+                        model.addDatatypeProperty("Gate", "hasID", wn, String.valueOf(id), "int");
 
-                    model.addDatatypeProperty("Gate", "hasStartNode", wn, String.valueOf(np), "int");
-                    np = np + w.length();
-                    model.addDatatypeProperty("Gate", "hasEndNode", wn, String.valueOf(np), "int");
+                        model.addDatatypeProperty("Gate", "hasStartNode", wn, String.valueOf(np), "int");
+                        np = np + w.length();
+                        model.addDatatypeProperty("Gate", "hasEndNode", wn, String.valueOf(np), "int");
 
 
-                    if(wc1==1)
-                    {
-                        model.addObjectProperty("DocStruct", "hasFirstWord", sn, wn);
+                        if (wc1 == 1) {
+                            model.addObjectProperty("DocStruct", "hasFirstWord", sn, wn);
+                        } else {
+                            model.addObjectProperty("DocStruct", "hasPreviousWord", wn, wp);
+                        }
+
+                        if (wc1 == words.length) {
+                            model.addDatatypeProperty("Gate", "hasEndNode", sn, String.valueOf(np - 1), "int");
+                            model.addObjectProperty("DocStruct", "hasLastWord", sn, wn);
+                        } else {
+                            model.addObjectProperty("DocStruct", "hasNextWord", wn, we);
+                        }
+
+                        model.addDatatypeProperty("DocStruct", "hasFirstCharacter", wn, w.substring(0, 1), "str");
+
+                        log("Parsed word " + wc1);
+                        // sameAsWord
                     }
-                    else
-                    {
-                        model.addObjectProperty("DocStruct", "hasPreviousWord", wn, wp);
-                    }
-
-                    if(wc1==words.length)
-                    {
-                        model.addDatatypeProperty("Gate", "hasEndNode", sn, String.valueOf(np-1), "int");
-                        model.addObjectProperty("DocStruct", "hasLastWord", sn, wn);
-                    }
-                    else
-                    {
-                        model.addObjectProperty("DocStruct", "hasNextWord", wn, we);
-                    }
-
-                    model.addDatatypeProperty("DocStruct", "hasFirstCharacter", wn, w.substring(0, 1), "str");
-
-                    log("Parsed word " + wc1);
-                    // sameAsWord
                 }
                 int p=0;
             }
@@ -1148,7 +1146,6 @@ public class Main {
         {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
-
     }
 
     static void addColumnMetaData(String COlID, String Description)
