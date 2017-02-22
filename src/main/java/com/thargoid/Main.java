@@ -38,6 +38,13 @@ import com.google.common.base.Optional;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
+import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
+import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
+
+import static com.thargoid.Main.getNow;
+import static com.thargoid.Main.inFolder;
+
+
 //args
 //0=process type
     //1=lassoing rhetoric
@@ -61,7 +68,7 @@ public class Main {
 
     static private Boolean LogToFile = true;
     static private String LogFileName;
-    static private String WorkFolder;
+    static public String WorkFolder;
     static private String quando;
     static private int AbstractArgCount;
     static private String[][] arguments;
@@ -88,7 +95,7 @@ public class Main {
     static int ColIDCount;
     //static String FrameNetFolder = "C:\\Users\\co17\\LocalStuff\\MyStuff\\Personal\\MPhil\\Framenet\\fndata-1.5\\fndata-1.5";
     static String FrameNetFolder = "D:\\LaRheto\\fndata-1.5\\fndata-1.5";
-   // static model model;
+    static model model;
 
 
     public static void main(String[] args) {
@@ -229,7 +236,8 @@ public class Main {
 
                         setupParseLookups();
                         ontoParse("1", "1");
-                        WorkFolder = WorkFolder.replace(inFolder, "5_ontoparsed");
+
+                        WorkFolder = WorkFolder.replace(inFolder, "5_OntoParsed");
                         //set up model here?
 
                     log("Ending ontoloy population");
@@ -287,10 +295,6 @@ public class Main {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
-
-
-
-
 
     static private boolean Framer(String pOutputType)
     {
@@ -463,7 +467,6 @@ public class Main {
         return output;
     }
 
-
     static public List<String> getFrameElements(String frame)
     {
         List<String> outputFrameElements = new ArrayList<String>();
@@ -499,7 +502,6 @@ public class Main {
         }
         return outputLUs;
     }
-
 
     static public String[] writeFrameData(String type, int colCount, List<String> frames, String tLU, String extraLine)
     {
@@ -765,7 +767,6 @@ public class Main {
         return rowout;
     }
 
-
     static private boolean Parse(String pInputType, String pOutputType)
     {
         boolean output = false;
@@ -940,10 +941,9 @@ public class Main {
         return Louts;
     }
 
-
-
     static private boolean ontoParse(String pInputType, String pOutputType)
     {
+        log("Started Onto Parse");
         boolean output = false;
         String ParseFolder = WorkFolder + File.separator + inFolder;
         String InputType = pInputType;
@@ -952,8 +952,8 @@ public class Main {
         //3 - csv two first columns are sentences to be parsed
         String OutputType = pOutputType;
 
-        String outputFolder = ParseFolder.replace(inFolder, "5_ontoparsed");
-        inFolder = "5_ontoparsed";
+        String outputFolder = ParseFolder.replace(inFolder, "5_OntoParsed");
+        inFolder = "5_OntoParsed";
         Path p = Paths.get(outputFolder);
 
         try {
@@ -980,6 +980,7 @@ public class Main {
                 }
             }
 
+
             File f = new File(ParseFolder);
             File[] matchingFiles = f.listFiles(new FilenameFilter() {
                 @Override
@@ -999,6 +1000,12 @@ public class Main {
             String InText = "";
 
             for(File tf : matchingFiles) {
+
+                log("Created ontology model for " + tf.getName());
+                model = new model();
+                model.addIndividual("DocStruct", "doc", "doc");
+
+                String everything;
                 log("Reading input file " + tf.getAbsolutePath());
                 BufferedReader br = new BufferedReader(new FileReader(tf.getAbsoluteFile()));
                 try {
@@ -1010,47 +1017,15 @@ public class Main {
                         sb.append(System.lineSeparator());
                         line = br.readLine();
                     }
-                    String everything = sb.toString();
-                    System.out.print(everything);
-                    InText = everything;
-
+                    everything = sb.toString();
+                    log(everything);
                 } finally {
                     br.close();
                 }
+                log("Read file text into variable");
 
-                Lins = parseText(2, InText);
-                String[] rowout;
-                String newFilename = outputFolder + File.separator + "parsed-" + tf.getName().replace("txt", "csv");
-                CSVWriter csvout = new CSVWriter(new FileWriter(newFilename));
-
-                for(String[] t : Lins)
-                {
-                    if(!t[NumParsedColumns-1].equals(".") & !t[NumParsedColumns-1].equals(",") & !t[NumParsedColumns-1].equals("!") & !t[NumParsedColumns-1].equals("?"))
-                    {
-                        if(t[6].equals("tendency"))
-                        {
-                            int y = 0;
-                        }
-
-                        rowout = new String[NumParsedColumns + 1];
-                        int a = 0;
-
-                        rowout[a]=tf.getName();
-                        a++;
-
-                        for(String s2 : t)
-                        {
-                            rowout[a]=s2;
-                            a++;
-                        }
-                        csvout.writeNext(rowout);
-                        rowcount++;
-                        log("Written a row: " + rowcount);
-                    }
-                }
-                log("Finished writing to file " + newFilename);
-                csvout.close();
-
+                ontoParseText(1, everything);
+                model.outputToFile(outputFolder, tf.getName());
             }
         }
         catch(Exception ex)
@@ -1061,64 +1036,120 @@ public class Main {
         return output;
     }
 
-    static List<String[]> ontoParseText(int type, String corpus)
+    static void ontoParseText(int type, String corpus)
     {
-        List<String[]> Louts = new ArrayList<String[]>();
+        log("Started OntoParseText");
         try
         {
             String[] outs = null;
             Annotation doc = new Annotation(corpus);
             pipeline.annotate(doc);
             List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
+            log("Created Annotation and Pipeline");
 
-            int s=0;
+            model.addIndividual("Gate", "paragraph", "p1");
+            model.addObjectProperty("DocStruct", "hasParagraph", "doc", "p1");
+
+            int id = 0;
+            int sc = 0;
+            int wc = 0;
+            int np = 1;
             for(CoreMap sentence : sentences)
             {
-                s++;
-                int w=0;
+                id++;
+                sc++;
+                String sn = "s" + sc;
+                String sp = "s" + Integer.toString(sc-1);
+                String se = "s" + Integer.toString(sc+1);
 
-                addColumnMetaData(String.valueOf(ColIDCount), "SentenceNumber");
-                addColumnMetaData(String.valueOf(ColIDCount), "WordNumber");
-                addColumnMetaData(String.valueOf(ColIDCount), "OriginalWord");
-                addColumnMetaData(String.valueOf(ColIDCount), "POSCode");
-                addColumnMetaData(String.valueOf(ColIDCount), "POSType");
-                addColumnMetaData(String.valueOf(ColIDCount), "NamedEntity");
-                addColumnMetaData(String.valueOf(ColIDCount), "Lemma");
+                model.addDatatypeProperty("Gate", "hasID", sn, String.valueOf(id), "int");
+                model.addIndividual("Gate", "Sentence", sn);
+                model.addObjectProperty("DocStruct", "hasSentence", "p1", sn);
 
-                for(CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class))
+                if(sc==1)
                 {
-                    outs = new String[NumParsedColumns];
-                    w++;
-                    String word = token.get(CoreAnnotations.TextAnnotation.class);
-                    String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
-                    String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
-                    String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
-                    String postype = PartOfSpeechType(pos);
-
-                    outs[0]=String.valueOf(s);
-                    outs[1]=String.valueOf(w);
-                    outs[2]=word;
-                    outs[3]=pos;
-                    outs[4]=postype;
-                    outs[5]=ne;
-                    outs[6]=lem;
-
-                    Louts.add(outs);
+                    model.addObjectProperty("DocStruct", "hasFirstSentence", "p1", sn);
                 }
-                log("Parsed sentence ... " + sentence.toString() + "");
+                else
+                {
+                    model.addObjectProperty("DocStruct", "hasPreviousSentence", sn, sp);
+                }
+
+
+                if(sc==sentences.size())
+                {
+                    model.addObjectProperty("DocStruct", "hasLastSentence", "p1", sn);
+                }
+                else
+                {
+                    model.addObjectProperty("DocStruct", "hasNextSentence", sn, se);
+                }
+
+                String Sx = sentence.toString();
+                String[] words = Sx.split(" ");
+
+                model.addDatatypeProperty("Gate", "hasStartNode", sn, String.valueOf(np), "int");
+
+                log("Parsed sentence " + sc);
+                int wc1 = 0;
+                for(String w : words)
+                {
+                    wc++;
+                    wc1++;
+                    w = w.replace(":", "");
+                    w = w.replace(";", "");
+                    w = w.replace(",", "");
+                    w = w.replace(".", "");
+                    w = w.replace("?", "");
+                    String wn = "w" + wc;
+                    String wp = "w" + Integer.toString(wc-1);
+                    String we = "w" + Integer.toString(wc+1);
+                    model.addIndividual("Gate", "word", wn);
+                    model.addObjectProperty("DocStruct", "hasWord", sn, wn);
+                    model.addDatatypeProperty("Gate", "hasString", wn, String.valueOf(w), "str");
+
+                    id++;
+                    model.addDatatypeProperty("Gate", "hasID", wn, String.valueOf(id), "int");
+
+                    model.addDatatypeProperty("Gate", "hasStartNode", wn, String.valueOf(np), "int");
+                    np = np + w.length();
+                    model.addDatatypeProperty("Gate", "hasEndNode", wn, String.valueOf(np), "int");
+
+
+                    if(wc1==1)
+                    {
+                        model.addObjectProperty("DocStruct", "hasFirstWord", sn, wn);
+                    }
+                    else
+                    {
+                        model.addObjectProperty("DocStruct", "hasPreviousWord", wn, wp);
+                    }
+
+                    if(wc1==words.length)
+                    {
+                        model.addDatatypeProperty("Gate", "hasEndNode", sn, String.valueOf(np-1), "int");
+                        model.addObjectProperty("DocStruct", "hasLastWord", sn, wn);
+                    }
+                    else
+                    {
+                        model.addObjectProperty("DocStruct", "hasNextWord", wn, we);
+                    }
+
+                    model.addDatatypeProperty("DocStruct", "hasFirstCharacter", wn, w.substring(0, 1), "str");
+
+                    log("Parsed word " + wc1);
+                    // sameAsWord
+                }
+                int p=0;
             }
+            log("Finished OntoParseText");
         }
         catch (Exception ex)
         {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
-        return Louts;
     }
-
-
-
-
 
     static void addColumnMetaData(String COlID, String Description)
     {
@@ -1127,13 +1158,12 @@ public class Main {
         ColIDCount++;
     }
 
-
     static String getNow()
     {
         return new SimpleDateFormat("yyyyMMddHHmmsss").format(new Date());
     }
 
-    static private void log(String text)
+    static public void log(String text)
     {
         try
         {
@@ -1269,6 +1299,440 @@ public class Main {
         pronounNodeNames = new ArrayList<String>();
         pronounNodeNames.add( "PRP");
         pronounNodeNames.add( "PRP$");
+
+        log("Parse lookups completed");
+    }
+
+}
+
+class model {
+
+    //static String NowD;
+    static String folderbase;
+    String baseIRI;
+    OWLOntologyManager om;
+    OWLOntology ont;
+    OWLDataFactory df;
+    DefaultPrefixManager pm;
+    OWLOntologyManager om_DocStruct;
+    OWLOntology ont_DocStruct;
+    OWLDataFactory fac_DocStruct;
+    DefaultPrefixManager pm_DocStruct;
+    OWLOntologyManager om_LassRhet;
+    OWLOntology ont_LassRhet;
+    OWLDataFactory fac_LassRhet;
+    DefaultPrefixManager pm_LassRhet;
+    OWLOntologyManager om_Gate;
+    OWLOntology ont_Gate;
+    OWLDataFactory fac_Gate;
+    DefaultPrefixManager pm_Gate;
+    OWLOntologyManager om_RhetDev;
+    OWLOntology ont_RhetDev;
+    OWLDataFactory fac_RhetDev;
+    DefaultPrefixManager pm_RhetDev;
+    OWLClass DocStruct_doc;
+    OWLClass Gate_word;
+    OWLClass Gate_sentence;
+    OWLClass Gate_paragraph;
+    OWLClass RhetDev_RhetoricalDevice;
+    OWLObjectProperty hasParagraph;
+    OWLObjectProperty hasSentence;
+    OWLObjectProperty hasNextWord;
+    OWLObjectProperty hasFirstWord;
+    OWLObjectProperty hasNextSentence;
+    OWLObjectProperty hasRhetoricalDevice;
+    OWLDataProperty hasString;
+    OWLDataProperty hasStartNode;
+    OWLDataProperty hasEndNode;
+    OWLIndividual RhetDev_Anaphora;
+
+    public OWLClass getClassType(String type)
+    {
+        OWLClass r = null;
+
+        if(type.equals("doc"))
+        {
+            r = DocStruct_doc;
+        }
+        else if(type.equals("word"))
+        {
+            r = Gate_word;
+        }
+        else if(type.equals("Sentence"))
+        {
+            r = Gate_sentence;
+        }
+        else if(type.equals("paragraph"))
+        {
+            r = Gate_paragraph;
+        }
+
+        return r;
+    }
+
+
+    public model(){
+
+        try {
+
+            baseIRI = "http://repositori.com/sw/onto/" + getNow() + ".owl";
+            IRI newIRI = IRI.create(baseIRI);
+            om = OWLManager.createOWLOntologyManager();
+            ont = om.createOntology(newIRI);
+            df = om.getOWLDataFactory();
+            pm = new DefaultPrefixManager(); //null, null, ont.toString()
+            pm.setPrefix("DocStruct:", "http://repositori.com/sw/onto/DocStruct.owl#");
+            pm.setPrefix("gate:", "http://repositori.com/sw/onto/gate.owl#");
+            //OWLDocumentFormat odf = new OWLXMLDocumentFormat();
+            //OWLOntologyXMLNamespaceManager onm = new OWLOntologyXMLNamespaceManager(ont, odf);
+            //onm.setPrefix("DocStruct:", "http://repositori.com/sw/onto/DocStruct.owl#");
+
+            String URLDocStruct = "http://repositori.com/sw/onto/DocStruct.owl";
+            om_DocStruct = OWLManager.createOWLOntologyManager();
+            IRI ontDocStruct = IRI.create(URLDocStruct);
+            ont_DocStruct = om_DocStruct.loadOntology(ontDocStruct);
+            fac_DocStruct = om_DocStruct.getOWLDataFactory();
+            pm_DocStruct = new DefaultPrefixManager(null, null, ontDocStruct.toString());
+
+            String URLGate = "http://repositori.com/sw/onto/gate.owl";
+            om_Gate = OWLManager.createOWLOntologyManager();
+            IRI ontGate = IRI.create(URLGate);
+            ont_Gate = om_Gate.loadOntology(ontGate);
+            fac_Gate = om_Gate.getOWLDataFactory();
+            pm_Gate = new DefaultPrefixManager(null, null, ontGate.toString());
+
+            String URLLassRhet = "http://repositori.com/sw/onto/LassoingRhetoric.owl";
+            om_LassRhet = OWLManager.createOWLOntologyManager();
+            IRI ontLassRhet = IRI.create(URLLassRhet);
+            ont_LassRhet = om_LassRhet.loadOntology(ontLassRhet);
+            fac_LassRhet = om_LassRhet.getOWLDataFactory();
+            pm_LassRhet = new DefaultPrefixManager(null, null, ontLassRhet.toString());
+
+            String URLRhetDev = "http://www.repositori.com/sw/onto/RhetoricalDevices.owl";
+            om_RhetDev = OWLManager.createOWLOntologyManager();
+            IRI ontRhetDev = IRI.create(URLRhetDev);
+            ont_RhetDev = om_RhetDev.loadOntology(ontRhetDev);
+            fac_RhetDev = om_RhetDev.getOWLDataFactory();
+            pm_RhetDev= new DefaultPrefixManager(null, null, ontRhetDev.toString());
+
+            setupClasses();
+
+            String DocStruct_base = "http://repositori.com/sw/onto/DocStruct.owl#";
+            String Gate_base = "http://repositori.com/sw/onto/gate.owl#";
+            String LassRhet_base = "http://repositori.com/sw/onto/LassoingRhetoric.owl#";
+
+            String OntoParseFolder = com.thargoid.Main.WorkFolder + File.separator + inFolder;
+           // String folderbase = OntoParseFolder.replace(inFolder, "5_OntoParsed");
+            inFolder = "5_OntoParsed";
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+    }
+
+    public void addIndividual(String onto, String owclass, String value)
+    {
+        OWLAxiom ax1 = null;
+        if(onto.equals("DocStruct"))
+        {
+            OWLNamedIndividual i1 = df.getOWLNamedIndividual(IRI.create("#" + value));
+            ax1 = df.getOWLClassAssertionAxiom(getClassType(owclass), i1);
+        }
+        else if(onto.equals("Gate"))
+        {
+            OWLNamedIndividual i1 = df.getOWLNamedIndividual(IRI.create("#" + value));
+            ax1 = df.getOWLClassAssertionAxiom(getClassType(owclass), i1);
+        }
+
+        AddAxiom addax1 = new AddAxiom(ont, ax1);
+        om.applyChange(addax1);
+    }
+
+    public void addObjectProperty(String onto, String owProp, String domain, String range)
+    {
+        OWLObjectPropertyAssertionAxiom ax1 = null;
+
+        if(onto.equals("DocStruct"))
+        {
+            OWLNamedIndividual id = df.getOWLNamedIndividual(IRI.create("#" + domain));
+            OWLNamedIndividual ir = df.getOWLNamedIndividual(IRI.create("#" + range));
+            OWLObjectProperty p = fac_DocStruct.getOWLObjectProperty("#" + owProp, pm_DocStruct);
+            ax1 = df.getOWLObjectPropertyAssertionAxiom(p, id, ir);
+        }
+        else if(onto.equals("Gate"))
+        {
+            OWLNamedIndividual id = df.getOWLNamedIndividual(IRI.create("#" + domain));
+            OWLNamedIndividual ir = df.getOWLNamedIndividual(IRI.create("#" + range));
+            OWLObjectProperty p = fac_Gate.getOWLObjectProperty("#" + owProp, pm_Gate);
+            ax1 = df.getOWLObjectPropertyAssertionAxiom(p, id, ir);
+        }
+
+        AddAxiom addax1 = new AddAxiom(ont, ax1);
+        om.applyChange(addax1);
+    }
+
+    public void addDatatypeProperty(String onto, String owProp, String domain, String value, String datatypetype)
+    {
+        OWLDataPropertyAssertionAxiom ax1 = null;
+
+        if(onto.equals("DocStruct"))
+        {
+            OWLDatatype odt = null;
+            OWLLiteral ol = null;
+
+            if(datatypetype.equals("int"))
+            {
+                odt = df.getOWLDatatype(OWL2Datatype.XSD_INTEGER.getIRI());
+                ol = df.getOWLLiteral(value, odt);
+            }
+            if(datatypetype.equals("str"))
+            {
+                odt = df.getOWLDatatype(OWL2Datatype.XSD_STRING.getIRI());
+                ol = df.getOWLLiteral(value, odt);
+            }
+
+            OWLNamedIndividual id = df.getOWLNamedIndividual(IRI.create("#" + domain));
+            OWLDataProperty p = fac_DocStruct.getOWLDataProperty(IRI.create("#" + owProp));
+            ax1 = df.getOWLDataPropertyAssertionAxiom(p, id, ol);
+        }
+        else if(onto.equals("Gate"))
+        {
+            OWLDatatype odt = null;
+            OWLLiteral ol = null;
+
+            if(datatypetype.equals("int"))
+            {
+                odt = df.getOWLDatatype(OWL2Datatype.XSD_INTEGER.getIRI());
+                ol = df.getOWLLiteral(value, odt);
+            }
+            if(datatypetype.equals("str"))
+            {
+                odt = df.getOWLDatatype(OWL2Datatype.XSD_STRING.getIRI());
+                ol = df.getOWLLiteral(value, odt);
+            }
+
+            OWLNamedIndividual id = df.getOWLNamedIndividual(IRI.create("#" + domain));
+            OWLDataProperty p = fac_Gate.getOWLDataProperty(IRI.create("#" + owProp));
+            ax1 = df.getOWLDataPropertyAssertionAxiom(p, id, ol);
+        }
+
+        AddAxiom addax1 = new AddAxiom(ont, ax1);
+        om.applyChange(addax1);
+    }
+
+
+    public void reasonPellet()
+    {
+        PelletReasoner reasoner = PelletReasonerFactory.getInstance().createReasoner(ont);
+        reasoner.getKB().realize();
+        reasoner.getKB().printClassTree();
+        // InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner);
+        //  gen.fillOntology(df, ont);
+    }
+
+
+    public void runSWRL()
+    {
+        try
+        {
+
+            //SWRLClassAtom at1 = fac_LassRhet.getSWRLClassAtom(IRI.create("#" + ))
+            //SWRLRule r1 = fac_LassRhet.getSWRLRule(IRI.create("#lassoAnaphora1"));
+
+            //SWRLRuleEngine ruleEngine = SWRLAPIFactory.createSWRLRuleEngine(ont_LassRhet);
+            //ruleEngine.infer();
+            //System.out.println(ruleEngine.toString());
+
+            //SQWRLQueryEngine queryEngine = SWRLAPIFactory.createSQWRLQueryEngine(ont);
+            //SQWRLResult result = queryEngine.runSQWRLQuery("q1", "swrlb:add(?x, 2, 2) -> sqwrl:select(?x)");
+
+            //if (result.next())
+            //  System.out.println("x: " + result.getLiteral("x").getInt());
+
+            //SWRLRuleEngine sre = SWRLAPIFactory.createSWRLRuleEngine(ont);
+            //sre.infer();
+
+            //SQWRLQueryEngine sqe = SWRLAPIFactory.createSQWRLQueryEngine(ont);
+            //SQWRLResult r = sqe.runSQWRLQuery("q1", "http://repositori.com/sw/onto/DocStruct.owl:Doc(?h) ^ hasParagraph(?h, ?i) ^ hasSentence(?i, ?z) ^ word(?x) ^ hasNextWord(?x, ?y) ^ Sentence(?z) ^ hasFirstWord(?z,?x) ^ word(?a) ^ hasNextWord(?a, ?b) ^ Sentence(?c) ^ hasFirstWord(?c, ?a) ^ hasNextSentence(?z, ?c) ^ hasString(?x, ?d) ^ hasString(?y, ?e) ^ hasString(?a, ?f) ^ hasString(?b, ?g) ^ swrlb:equal(?d, ?f) ^ swrlb:equal(?e, ?g) ^ hasStartNode(?x, ?j) ^ hasEndNode(?b, ?k) -> hasRhetoricalDevice(?h, Anaphora) ^ hasStartNode(Anaphora, ?j) ^ hasEndNode(Anaphora, ?k)");
+
+            //SQWRLResult r = sqe.runSQWRLQuery("q1", "gate:hasWord(?s1, ?w1) ^ gate:hasWord(?s2, ?w2) ^ hasString(?w1, ?st1) ^ hasString(?w2, ?st2) ^ swrlb:equals(?st1, ?st2) -> hasNextSentence(?s1, ?s2)");
+
+            //if(r.next())
+            // {
+            //  System.out.println("Name" + r.toString());
+            // }
+
+            //OWLClass cdoc = df.getOWLClass("#Doc", pm);
+            //OWLClass cSentence = df.getOWLClass("#Sentence", pm);
+
+            IRI iv1 = IRI.create(baseIRI + "#x");
+            SWRLVariable v1 = df.getSWRLVariable(iv1);
+
+            //IRI iv2 = IRI.create(baseIRI + "#y");
+            //SWRLVariable v2 = df.getSWRLVariable(iv2);
+
+            Set<SWRLAtom> body = new TreeSet<SWRLAtom>();
+            body.add(df.getSWRLClassAtom(DocStruct_doc, v1));
+
+            Set<SWRLAtom> head = new TreeSet<SWRLAtom>();
+            head.add(df.getSWRLClassAtom(Gate_word, v1));
+
+            SWRLRule rule = df.getSWRLRule(body, head);
+            ont.getOWLOntologyManager().addAxiom(ont, rule);
+
+
+
+
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+    }
+
+
+    public void runSWRLAnaphora()
+    {
+        try
+        {
+            IRI ih = IRI.create(baseIRI + "#h");
+            SWRLVariable vh = df.getSWRLVariable(ih);
+
+            IRI ii = IRI.create(baseIRI + "#i");
+            SWRLVariable vi = df.getSWRLVariable(ii);
+
+            IRI iz = IRI.create(baseIRI + "#z");
+            SWRLVariable vz = df.getSWRLVariable(iz);
+
+            IRI ix = IRI.create(baseIRI + "#x");
+            SWRLVariable vx = df.getSWRLVariable(ix);
+
+            IRI iy = IRI.create(baseIRI + "#y");
+            SWRLVariable vy = df.getSWRLVariable(iy);
+
+            IRI ia = IRI.create(baseIRI + "#a");
+            SWRLVariable va = df.getSWRLVariable(ia);
+
+            IRI ib = IRI.create(baseIRI + "#b");
+            SWRLVariable vb = df.getSWRLVariable(ib);
+
+            IRI ic = IRI.create(baseIRI + "#c");
+            SWRLVariable vc = df.getSWRLVariable(ic);
+
+            IRI id = IRI.create(baseIRI + "#d");
+            SWRLVariable vd = df.getSWRLVariable(id);
+
+            IRI ie = IRI.create(baseIRI + "#e");
+            SWRLVariable ve = df.getSWRLVariable(ie);
+
+            IRI iif = IRI.create(baseIRI + "#f");
+            SWRLVariable vf = df.getSWRLVariable(iif);
+
+            IRI ig = IRI.create(baseIRI + "#g");
+            SWRLVariable vg = df.getSWRLVariable(ig);
+
+            IRI ij = IRI.create(baseIRI + "#j");
+            SWRLVariable vj = df.getSWRLVariable(ij);
+
+            IRI ik = IRI.create(baseIRI + "#k");
+            SWRLVariable vk = df.getSWRLVariable(ik);
+
+            IRI il = IRI.create(baseIRI + "#l");
+            SWRLVariable vl = df.getSWRLVariable(il);
+
+            Set<SWRLAtom> body = new TreeSet<SWRLAtom>();
+            body.add(df.getSWRLClassAtom(DocStruct_doc, vh));
+            // body.add(df.getSWRLClassAtom(RhetDev_RhetoricalDevice, vl));
+            //SWRLIndividualArgument sia = new SWRLIndividualArgumentImpl(RhetDev_Anaphora);
+            // body.add(df.getSWRLClassAtom(RhetDev_Anaphora, vl));
+            //body.add(df.getSWRLIndividualArgument(RhetDev_Anaphora, vl));
+            body.add(df.getSWRLObjectPropertyAtom(hasParagraph, vh, vi));
+            body.add(df.getSWRLObjectPropertyAtom(hasSentence, vi, vz));
+            body.add(df.getSWRLClassAtom(Gate_word, vx));
+            body.add(df.getSWRLObjectPropertyAtom(hasNextWord, vx, vy));
+            body.add(df.getSWRLClassAtom(Gate_sentence, vz));
+            body.add(df.getSWRLObjectPropertyAtom(hasFirstWord, vz, vx));
+            body.add(df.getSWRLClassAtom(Gate_word, va));
+            body.add(df.getSWRLObjectPropertyAtom(hasNextWord, va, vb));
+            body.add(df.getSWRLClassAtom(Gate_sentence, vc));
+            body.add(df.getSWRLObjectPropertyAtom(hasFirstWord, vc, va));
+            body.add(df.getSWRLObjectPropertyAtom(hasNextSentence, vz, vc));
+
+            SWRLIndividualArgument vm = df.getSWRLIndividualArgument(RhetDev_Anaphora);
+            //body.add(df.getOWLNamedIndividual(vm);
+        /*    body.add(df.getSWRLDataPropertyAtom(hasString, vx, vd));
+            body.add(df.getSWRLDataPropertyAtom(hasString, vy, ve));
+            body.add(df.getSWRLDataPropertyAtom(hasString, va, vf));
+            body.add(df.getSWRLDataPropertyAtom(hasString, vb, vg));
+            List<SWRLDArgument> ea1 = new ArrayList<SWRLDArgument>(2);
+            ea1.add(vd);
+            ea1.add(vf);
+            body.add(df.getSWRLBuiltInAtom(IRI.create("http://www.w3.org/2003/11/swrlb#equal"), ea1));
+            List<SWRLDArgument> ea2 = new ArrayList<SWRLDArgument>(2);
+            ea2.add(ve);
+            ea2.add(vg);
+            body.add(df.getSWRLBuiltInAtom(IRI.create("http://www.w3.org/2003/11/swrlb#equal"), ea2));
+            body.add(df.getSWRLDataPropertyAtom(hasStartNode, vx, vj));
+            body.add(df.getSWRLDataPropertyAtom(hasEndNode, vb, vk));
+*/
+            Set<SWRLAtom> head = new TreeSet<SWRLAtom>();
+            head.add(df.getSWRLObjectPropertyAtom(hasRhetoricalDevice, vh, vm));
+            //head.add(df.getSWRLDataPropertyAtom(hasStartNode, vl, vj));
+            //head.add(df.getSWRLDataPropertyAtom(hasEndNode, vl, vk));
+
+            SWRLRule rule = df.getSWRLRule(body, head);
+            ont.getOWLOntologyManager().addAxiom(ont, rule);
+        }
+        catch (Exception e) {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+    }
+
+    public void outputToFile(String saveFolder, String fileName) {
+        try {
+            fileName = fileName.replace(".", "");
+            String u = saveFolder + File.separator + "ont_" + getNow() + "_" + fileName + ".owl";
+            File f = new File(u);
+            com.thargoid.Main.log("Outputting file " + u);
+            om.saveOntology(ont, IRI.create(f.toURI()));
+        }
+        catch (Exception e) {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+    }
+
+    private void setupClasses()
+    {
+        DocStruct_doc = fac_DocStruct.getOWLClass("#Doc", pm_DocStruct);
+        Gate_word = fac_Gate.getOWLClass("#word", pm_Gate);
+        Gate_sentence = fac_Gate.getOWLClass("#Sentence", pm_Gate);
+        Gate_paragraph = fac_Gate.getOWLClass("#paragraph", pm_Gate);
+        RhetDev_RhetoricalDevice = fac_RhetDev.getOWLClass("#RhetoricalDevice", pm_RhetDev);
+        RhetDev_Anaphora = fac_RhetDev.getOWLNamedIndividual("#Anaphora", pm_RhetDev);
+        hasParagraph = fac_DocStruct.getOWLObjectProperty("#hasParagraph", pm_DocStruct);
+        hasSentence = fac_DocStruct.getOWLObjectProperty("#hasSentence", pm_DocStruct);
+        hasNextWord = fac_DocStruct.getOWLObjectProperty("#hasNextWord", pm_DocStruct);
+        hasNextSentence = fac_DocStruct.getOWLObjectProperty("#hasNextSentence", pm_DocStruct);
+        hasString = fac_Gate.getOWLDataProperty("hasString", pm_Gate);
+        hasStartNode = fac_Gate.getOWLDataProperty("#hasStartNode", pm_Gate);
+        hasEndNode = fac_Gate.getOWLDataProperty("#hasEndNode", pm_Gate);
+        hasFirstWord = fac_DocStruct.getOWLObjectProperty("#hasFirstWord", pm_DocStruct);
+        hasRhetoricalDevice = fac_RhetDev.getOWLObjectProperty("#hasRhetoricalDevice", pm_RhetDev);
+    }
+
+    public void printAxioms()
+    {
+        Set<OWLAxiom> ax = ont_DocStruct.getAxioms();
+
+        for (OWLAxiom a : ax) {
+            System.out.println(a.toString());
+        }
     }
 
 }
