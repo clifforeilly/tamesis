@@ -250,6 +250,8 @@ public class Main {
                     //inference
                     log("Starting inference");
 
+
+
                     log("Ending inference");
 
                     break;
@@ -1025,6 +1027,9 @@ public class Main {
                 log("Read file text into variable");
 
                 ontoParseText(1, everything);
+                model.runSWRLAnaphora();
+                //model.runSWRL();
+                model.reasonPellet();
                 model.outputToFile(outputFolder, tf.getName());
             }
         }
@@ -1525,9 +1530,11 @@ class model {
     {
         PelletReasoner reasoner = PelletReasonerFactory.getInstance().createReasoner(ont);
         reasoner.getKB().realize();
+        com.thargoid.Main.log("Pellet consistency: " + reasoner.isConsistent());
         reasoner.getKB().printClassTree();
-        // InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner);
-        //  gen.fillOntology(df, ont);
+
+        InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner);
+        gen.fillOntology(df, ont);
     }
 
 
@@ -1568,20 +1575,23 @@ class model {
             IRI iv1 = IRI.create(baseIRI + "#x");
             SWRLVariable v1 = df.getSWRLVariable(iv1);
 
-            //IRI iv2 = IRI.create(baseIRI + "#y");
-            //SWRLVariable v2 = df.getSWRLVariable(iv2);
+            IRI iv2 = IRI.create(baseIRI + "#y");
+            SWRLVariable v2 = df.getSWRLVariable(iv2);
+
+            IRI iv3 = IRI.create(baseIRI + "#z");
+            SWRLVariable v3 = df.getSWRLVariable(iv3);
 
             Set<SWRLAtom> body = new TreeSet<SWRLAtom>();
-            body.add(df.getSWRLClassAtom(DocStruct_doc, v1));
+            //body.add(df.getSWRLClassAtom(DocStruct_doc, v1));
+            body.add(df.getSWRLClassAtom(Gate_sentence, v2));
+            body.add(df.getSWRLClassAtom(Gate_sentence, v3));
 
             Set<SWRLAtom> head = new TreeSet<SWRLAtom>();
-            head.add(df.getSWRLClassAtom(Gate_word, v1));
+            //head.add(df.getSWRLClassAtom(Gate_word, v1));
+            head.add(df.getSWRLObjectPropertyAtom(hasNextSentence, v3, v2));
 
             SWRLRule rule = df.getSWRLRule(body, head);
             ont.getOWLOntologyManager().addAxiom(ont, rule);
-
-
-
 
         }
         catch (Exception e)
@@ -1620,16 +1630,16 @@ class model {
             IRI ic = IRI.create(baseIRI + "#c");
             SWRLVariable vc = df.getSWRLVariable(ic);
 
-            IRI id = IRI.create(baseIRI + "#d");
+            IRI id = IRI.create("http://www.w3.org/2001/XMLSchema#string");
             SWRLVariable vd = df.getSWRLVariable(id);
 
-            IRI ie = IRI.create(baseIRI + "#e");
+            IRI ie = IRI.create("http://www.w3.org/2001/XMLSchema#string");
             SWRLVariable ve = df.getSWRLVariable(ie);
 
-            IRI iif = IRI.create(baseIRI + "#f");
+            IRI iif = IRI.create("http://www.w3.org/2001/XMLSchema#string");
             SWRLVariable vf = df.getSWRLVariable(iif);
 
-            IRI ig = IRI.create(baseIRI + "#g");
+            IRI ig = IRI.create("http://www.w3.org/2001/XMLSchema#string");
             SWRLVariable vg = df.getSWRLVariable(ig);
 
             IRI ij = IRI.create(baseIRI + "#j");
@@ -1647,13 +1657,16 @@ class model {
             //SWRLIndividualArgument sia = new SWRLIndividualArgumentImpl(RhetDev_Anaphora);
             // body.add(df.getSWRLClassAtom(RhetDev_Anaphora, vl));
             //body.add(df.getSWRLIndividualArgument(RhetDev_Anaphora, vl));
+            body.add(df.getSWRLClassAtom(Gate_paragraph, vi));
+            body.add(df.getSWRLClassAtom(Gate_sentence, vz));
             body.add(df.getSWRLObjectPropertyAtom(hasParagraph, vh, vi));
             body.add(df.getSWRLObjectPropertyAtom(hasSentence, vi, vz));
             body.add(df.getSWRLClassAtom(Gate_word, vx));
+            body.add(df.getSWRLClassAtom(Gate_word, vy));
             body.add(df.getSWRLObjectPropertyAtom(hasNextWord, vx, vy));
-            body.add(df.getSWRLClassAtom(Gate_sentence, vz));
             body.add(df.getSWRLObjectPropertyAtom(hasFirstWord, vz, vx));
             body.add(df.getSWRLClassAtom(Gate_word, va));
+            body.add(df.getSWRLClassAtom(Gate_word, vb));
             body.add(df.getSWRLObjectPropertyAtom(hasNextWord, va, vb));
             body.add(df.getSWRLClassAtom(Gate_sentence, vc));
             body.add(df.getSWRLObjectPropertyAtom(hasFirstWord, vc, va));
@@ -1661,7 +1674,10 @@ class model {
 
             SWRLIndividualArgument vm = df.getSWRLIndividualArgument(RhetDev_Anaphora);
             //body.add(df.getOWLNamedIndividual(vm);
-        /*    body.add(df.getSWRLDataPropertyAtom(hasString, vx, vd));
+            //body.add(df.getSWRLClassAtom(IRI.create("http://www.w3.org/2001/XMLSchema#string"), vd));
+            //body.add(df.getOWLDataProperty(IRI.create("http://www.w3.org/2001/XMLSchema#string")), vd);
+
+            body.add(df.getSWRLDataPropertyAtom(hasString, vx, vd));
             body.add(df.getSWRLDataPropertyAtom(hasString, vy, ve));
             body.add(df.getSWRLDataPropertyAtom(hasString, va, vf));
             body.add(df.getSWRLDataPropertyAtom(hasString, vb, vg));
@@ -1673,9 +1689,13 @@ class model {
             ea2.add(ve);
             ea2.add(vg);
             body.add(df.getSWRLBuiltInAtom(IRI.create("http://www.w3.org/2003/11/swrlb#equal"), ea2));
-            body.add(df.getSWRLDataPropertyAtom(hasStartNode, vx, vj));
-            body.add(df.getSWRLDataPropertyAtom(hasEndNode, vb, vk));
-*/
+
+
+
+
+            //body.add(df.getSWRLDataPropertyAtom(hasStartNode, vx, vj));
+            //body.add(df.getSWRLDataPropertyAtom(hasEndNode, vb, vk));
+
             Set<SWRLAtom> head = new TreeSet<SWRLAtom>();
             head.add(df.getSWRLObjectPropertyAtom(hasRhetoricalDevice, vh, vm));
             //head.add(df.getSWRLDataPropertyAtom(hasStartNode, vl, vj));
