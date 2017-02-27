@@ -7,6 +7,10 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import com.clarkparsia.owlapi.explanation.PelletExplanation;
+import com.clarkparsia.owlapi.explanation.io.manchester.ManchesterSyntaxExplanationRenderer;
+import com.clarkparsia.owlapiv3.OWL;
+import com.clarkparsia.pellet.rules.model.Rule;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -35,6 +39,9 @@ import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
 
 import com.google.common.base.Optional;
 
+import org.swrlapi.core.SWRLAPIRule;
+import org.swrlapi.core.SWRLRuleEngine;
+import org.swrlapi.factory.SWRLAPIFactory;
 import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
 import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
 
@@ -43,6 +50,7 @@ import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 
 import static com.thargoid.Main.getNow;
 import static com.thargoid.Main.inFolder;
+import static com.thargoid.Main.log;
 
 
 //args
@@ -1027,8 +1035,8 @@ public class Main {
                 log("Read file text into variable");
 
                 ontoParseText(1, everything);
-                model.runSWRLAnaphora();
-                //model.runSWRL();
+                //model.runSWRLAnaphora();
+                model.runSWRL();
                 model.reasonPellet();
                 model.outputToFile(outputFolder, tf.getName());
             }
@@ -1052,7 +1060,7 @@ public class Main {
             List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
             log("Created Annotation and Pipeline");
 
-            model.addIndividual("Gate", "paragraph", "p1");
+            model.addIndividual("Gate", "Paragraph", "p1");
             model.addObjectProperty("DocStruct", "hasParagraph", "doc", "p1");
 
             int id = 0;
@@ -1364,7 +1372,7 @@ class model {
         {
             r = Gate_sentence;
         }
-        else if(type.equals("paragraph"))
+        else if(type.equals("Paragraph"))
         {
             r = Gate_paragraph;
         }
@@ -1497,7 +1505,8 @@ class model {
             }
 
             OWLNamedIndividual id = df.getOWLNamedIndividual(IRI.create("#" + domain));
-            OWLDataProperty p = fac_DocStruct.getOWLDataProperty(IRI.create("#" + owProp));
+            OWLDataProperty p = fac_DocStruct.getOWLDataProperty("#" + owProp, pm_DocStruct);
+
             ax1 = df.getOWLDataPropertyAssertionAxiom(p, id, ol);
         }
         else if(onto.equals("Gate"))
@@ -1517,7 +1526,7 @@ class model {
             }
 
             OWLNamedIndividual id = df.getOWLNamedIndividual(IRI.create("#" + domain));
-            OWLDataProperty p = fac_Gate.getOWLDataProperty(IRI.create("#" + owProp));
+            OWLDataProperty p = fac_Gate.getOWLDataProperty("#" + owProp, pm_Gate);
             ax1 = df.getOWLDataPropertyAssertionAxiom(p, id, ol);
         }
 
@@ -1528,13 +1537,58 @@ class model {
 
     public void reasonPellet()
     {
-        PelletReasoner reasoner = PelletReasonerFactory.getInstance().createReasoner(ont);
-        reasoner.getKB().realize();
-        com.thargoid.Main.log("Pellet consistency: " + reasoner.isConsistent());
-        reasoner.getKB().printClassTree();
+        try {
+            //PelletExplanation.setup();
+            //ManchesterSyntaxExplanationRenderer renderer = new ManchesterSyntaxExplanationRenderer();
+            //PrintWriter out = new PrintWriter(System.out);
+            //renderer.startRendering(out);
 
-        InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner);
-        gen.fillOntology(df, ont);
+            PelletReasoner reasoner = PelletReasonerFactory.getInstance().createReasoner(ont);
+
+            //PelletExplanation pellex = new PelletExplanation(reasoner);
+
+            //OWLClass doc = OWL.Class(baseIRI + "#doc");
+            //Set<Set<OWLAxiom>> exp = pellex.getUnsatisfiableExplanations(doc);
+            //out.println(doc);
+
+            //renderer.render(exp);
+
+            //boolean t = true;
+            //reasoner.getKB().setDoExplanation(t);
+
+            reasoner.getKB().realize();
+            log("Pellet consistency: " + reasoner.isConsistent());
+            reasoner.getKB().printClassTree();
+            Set<Rule> rules = reasoner.getKB().getRules();
+            for (Rule r : rules) {
+                log(r.toString());
+            }
+            log(reasoner.getKB().getInfo());
+            log(reasoner.getKB().toString());
+
+            /*InferredObjectPropertyAxiomGenerator<OWLObjectPropertyAxiom> generator = new InferredObjectPropertyAxiomGenerator<OWLObjectPropertyAxiom>(){
+
+                @Override
+                public String getLabel() {
+                    return null;
+                }
+
+                @Override
+                protected void addAxioms(OWLObjectProperty entity,
+                                         OWLReasoner reasoner, OWLDataFactory dataFactory,
+                                         Set<OWLObjectPropertyAxiom> result) {}
+            };
+            generator.createAxioms(df, reasoner);
+            log(generator.toString());
+            */
+            InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner);
+            gen.fillOntology(df, ont);
+        }
+        catch(Exception ex)
+        {
+            System.out.println("Error: " + ex.toString() + " - " + ex.getMessage());
+            System.out.println(ex.toString());
+        }
     }
 
 
@@ -1542,6 +1596,20 @@ class model {
     {
         try
         {
+            SWRLRuleEngine ruleEngule = SWRLAPIFactory.createSWRLRuleEngine(ont_LassRhet);
+
+            Set<SWRLAPIRule> rules = ruleEngule.getSWRLRules();
+
+            for (SWRLAPIRule rule:rules)
+            {
+                log(rule.getRuleName().toString());
+                log(rule.toString());
+                if(rule.toString().contains("Antimetabole")) {
+
+                    ont.getOWLOntologyManager().addAxiom(ont, rule);
+                }
+            }
+
 
             //SWRLClassAtom at1 = fac_LassRhet.getSWRLClassAtom(IRI.create("#" + ))
             //SWRLRule r1 = fac_LassRhet.getSWRLRule(IRI.create("#lassoAnaphora1"));
@@ -1571,28 +1639,52 @@ class model {
 
             //OWLClass cdoc = df.getOWLClass("#Doc", pm);
             //OWLClass cSentence = df.getOWLClass("#Sentence", pm);
+/*
+            IRI ix = IRI.create(baseIRI + "#x");
+            SWRLVariable vx = df.getSWRLVariable(ix);
 
-            IRI iv1 = IRI.create(baseIRI + "#x");
-            SWRLVariable v1 = df.getSWRLVariable(iv1);
+            IRI iy = IRI.create(baseIRI + "#y");
+            SWRLVariable vy = df.getSWRLVariable(iy);
 
-            IRI iv2 = IRI.create(baseIRI + "#y");
-            SWRLVariable v2 = df.getSWRLVariable(iv2);
+            IRI iz = IRI.create(baseIRI + "#z");
+            SWRLVariable vz = df.getSWRLVariable(iz);
 
-            IRI iv3 = IRI.create(baseIRI + "#z");
-            SWRLVariable v3 = df.getSWRLVariable(iv3);
+            IRI ia = IRI.create(baseIRI + "#a");
+            SWRLVariable va = df.getSWRLVariable(ia);
+
+            IRI ib = IRI.create(baseIRI + "#b");
+            SWRLVariable vb = df.getSWRLVariable(ib);
+
+            IRI id = IRI.create(baseIRI + "#d");
+            SWRLVariable vd = df.getSWRLVariable(id);
+
+            IRI ie = IRI.create(baseIRI + "#e");
+            SWRLVariable ve = df.getSWRLVariable(ie);
+
 
             Set<SWRLAtom> body = new TreeSet<SWRLAtom>();
             //body.add(df.getSWRLClassAtom(DocStruct_doc, v1));
-            body.add(df.getSWRLClassAtom(Gate_sentence, v2));
-            body.add(df.getSWRLClassAtom(Gate_sentence, v3));
+            body.add(df.getSWRLClassAtom(Gate_sentence, vx));
+            body.add(df.getSWRLClassAtom(Gate_sentence, vy));
+            body.add(df.getSWRLClassAtom(Gate_word, va));
+            body.add(df.getSWRLClassAtom(Gate_word, vb));
+            body.add(df.getSWRLObjectPropertyAtom(hasFirstWord, vz, va));
+            body.add(df.getSWRLObjectPropertyAtom(hasFirstWord, vy, vb));
+            body.add(df.getSWRLDataPropertyAtom(hasString, va, vd));
+            body.add(df.getSWRLDataPropertyAtom(hasString, vb, ve));
+
+            List<SWRLDArgument> ea1 = new ArrayList<>(2);
+            ea1.add(vd);
+            ea1.add(ve);
+            body.add(df.getSWRLBuiltInAtom(IRI.create("http://www.w3.org/2003/11/swrlb#equal"), ea1));
 
             Set<SWRLAtom> head = new TreeSet<SWRLAtom>();
             //head.add(df.getSWRLClassAtom(Gate_word, v1));
-            head.add(df.getSWRLObjectPropertyAtom(hasNextSentence, v3, v2));
+            head.add(df.getSWRLObjectPropertyAtom(hasNextSentence, vy, vx));
 
             SWRLRule rule = df.getSWRLRule(body, head);
             ont.getOWLOntologyManager().addAxiom(ont, rule);
-
+*/
         }
         catch (Exception e)
         {
@@ -1715,7 +1807,7 @@ class model {
             fileName = fileName.replace(".", "");
             String u = saveFolder + File.separator + "ont_" + getNow() + "_" + fileName + ".owl";
             File f = new File(u);
-            com.thargoid.Main.log("Outputting file " + u);
+            log("Outputting file " + u);
             om.saveOntology(ont, IRI.create(f.toURI()));
         }
         catch (Exception e) {
@@ -1729,7 +1821,7 @@ class model {
         DocStruct_doc = fac_DocStruct.getOWLClass("#Doc", pm_DocStruct);
         Gate_word = fac_Gate.getOWLClass("#word", pm_Gate);
         Gate_sentence = fac_Gate.getOWLClass("#Sentence", pm_Gate);
-        Gate_paragraph = fac_Gate.getOWLClass("#paragraph", pm_Gate);
+        Gate_paragraph = fac_Gate.getOWLClass("#Paragraph", pm_Gate);
         RhetDev_RhetoricalDevice = fac_RhetDev.getOWLClass("#RhetoricalDevice", pm_RhetDev);
         RhetDev_Anaphora = fac_RhetDev.getOWLNamedIndividual("#Anaphora", pm_RhetDev);
         hasParagraph = fac_DocStruct.getOWLObjectProperty("#hasParagraph", pm_DocStruct);
