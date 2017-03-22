@@ -11,6 +11,8 @@ import com.clarkparsia.owlapi.explanation.PelletExplanation;
 import com.clarkparsia.owlapi.explanation.io.manchester.ManchesterSyntaxExplanationRenderer;
 import com.clarkparsia.owlapiv3.OWL;
 import com.clarkparsia.pellet.rules.model.Rule;
+import com.hp.hpl.jena.ontology.OntModel;
+import com.hp.hpl.jena.ontology.Ontology;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -20,6 +22,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import de.saar.coli.salsa.reiter.framenet.*;
 import de.saar.coli.salsa.reiter.framenet.FrameNet;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.ModelFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.formats.ManchesterSyntaxDocumentFormat;
 import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
@@ -51,6 +55,7 @@ import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import static com.thargoid.Main.getNow;
 import static com.thargoid.Main.inFolder;
 import static com.thargoid.Main.log;
+import org.apache.jena.*;
 
 
 //args
@@ -65,9 +70,10 @@ import static com.thargoid.Main.log;
     // framenet (f)
     // post-frame processing (g)
     // wordnet (w)
-    // lda (;)
+    // lda (l)
     // text markup, e.g. ontological (o)
     // inference (i)
+    // jena framework (j)
     // e.g. pafgwloi
 //4=delete files from each folder (0 or 1)
 //5
@@ -104,6 +110,8 @@ public class Main {
     //static String FrameNetFolder = "C:\\Users\\co17\\LocalStuff\\MyStuff\\Personal\\MPhil\\Framenet\\fndata-1.5\\fndata-1.5";
     static String FrameNetFolder = "D:\\LaRheto\\fndata-1.5\\fndata-1.5";
     static model model;
+    static OntModel jModel;
+
 
 
     public static void main(String[] args) {
@@ -252,6 +260,20 @@ public class Main {
 
                     break;
 
+                case 'j':
+
+                    //ontology population
+                    log("Starting Jena ontoloy population");
+
+                    setupParseLookups();
+                    JontoParse("1", "1");
+
+                    WorkFolder = WorkFolder.replace(inFolder, "5_OntoParsed");
+                    //set up model here?
+
+                    log("Ending Jena ontoloy population");
+
+                    break;
 
                 case 'i':
 
@@ -598,8 +620,6 @@ public class Main {
                     pFs.trim();
                     rowout[a]=rowout[a] + " " + pFs;
                     a++;
-
-
 
                     String uFs = "";
                     for(Frame IdF : fr.uses())
@@ -951,7 +971,7 @@ public class Main {
         return Louts;
     }
 
-    static private boolean ontoParse(String pInputType, String pOutputType)
+    static private boolean JontoParse(String pInputType, String pOutputType)
     {
         log("Started Onto Parse");
         boolean output = false;
@@ -990,6 +1010,215 @@ public class Main {
                 }
             }
 
+            File f = new File(ParseFolder);
+            File[] matchingFiles = f.listFiles(new FilenameFilter() {
+                @Override
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".txt");
+                }
+            });
+
+            int filecount=0;
+            List<String[]> Lins = new ArrayList<String[]>();
+
+            Properties props = new Properties();
+            props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+            pipeline = new StanfordCoreNLP(props);
+
+            int rowcount = 0;
+            String InText = "";
+
+            for(File tf : matchingFiles) {
+
+                log("Created ontology model for " + tf.getName());
+                //jModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, null);
+
+                model.addIndividual("DocStruct", "doc", "doc");
+
+                String everything;
+                log("Reading input file " + tf.getAbsolutePath());
+                BufferedReader br = new BufferedReader(new FileReader(tf.getAbsoluteFile()));
+                try {
+                    StringBuilder sb = new StringBuilder();
+                    String line = br.readLine();
+
+                    while (line != null) {
+                        sb.append(line);
+                        sb.append(System.lineSeparator());
+                        line = br.readLine();
+                    }
+                    everything = sb.toString();
+                    log(everything);
+                } finally {
+                    br.close();
+                }
+                log("Read file text into variable");
+
+                JontoParseText(1, everything);
+                //model.runSWRLAnaphora();
+                model.runSWRL();
+                model.reasonPellet();
+                model.outputToFile(outputFolder, tf.getName());
+            }
+        }
+        catch(Exception ex)
+        {
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+        }
+
+        return output;
+    }
+
+    static void JontoParseText(int type, String corpus)
+    {
+        log("Started OntoParseText");
+        try
+        {
+            String[] outs = null;
+            Annotation doc = new Annotation(corpus);
+            pipeline.annotate(doc);
+            List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
+            log("Created Annotation and Pipeline");
+
+            model.addIndividual("Gate", "Paragraph", "p1");
+            model.addObjectProperty("DocStruct", "hasParagraph", "doc", "p1");
+
+            int id = 0;
+            int sc = 0;
+            int wc = 0;
+            int np = 1;
+            for(CoreMap sentence : sentences)
+            {
+                id++;
+                sc++;
+                String sn = "s" + sc;
+                String sp = "s" + Integer.toString(sc-1);
+                String se = "s" + Integer.toString(sc+1);
+
+                model.addDatatypeProperty("Gate", "hasID", sn, String.valueOf(id), "int");
+                model.addIndividual("Gate", "Sentence", sn);
+                model.addObjectProperty("DocStruct", "hasSentence", "p1", sn);
+
+                if(sc==1)
+                {
+                    model.addObjectProperty("DocStruct", "hasFirstSentence", "p1", sn);
+                }
+                else
+                {
+                    model.addObjectProperty("DocStruct", "hasPreviousSentence", sn, sp);
+                }
+
+
+                if(sc==sentences.size())
+                {
+                    model.addObjectProperty("DocStruct", "hasLastSentence", "p1", sn);
+                }
+                else
+                {
+                    model.addObjectProperty("DocStruct", "hasNextSentence", sn, se);
+                }
+
+                String Sx = sentence.toString();
+                String[] words = Sx.split(" ");
+
+                model.addDatatypeProperty("Gate", "hasStartNode", sn, String.valueOf(np), "int");
+
+                log("Parsed sentence " + sc);
+                int wc1 = 0;
+                for(String w : words)
+                {
+                    if(w.length()>0) {
+                        wc++;
+                        wc1++;
+                        w = w.replace(":", "");
+                        w = w.replace(";", "");
+                        w = w.replace(",", "");
+                        w = w.replace(".", "");
+                        w = w.replace("?", "");
+                        w = w.replace("(", "");
+                        w = w.replace(")", "");
+                        String wn = "w" + wc;
+                        String wp = "w" + Integer.toString(wc - 1);
+                        String we = "w" + Integer.toString(wc + 1);
+                        model.addIndividual("Gate", "word", wn);
+                        model.addObjectProperty("DocStruct", "hasWord", sn, wn);
+                        model.addDatatypeProperty("Gate", "hasString", wn, String.valueOf(w), "str");
+
+                        id++;
+                        model.addDatatypeProperty("Gate", "hasID", wn, String.valueOf(id), "int");
+
+                        model.addDatatypeProperty("Gate", "hasStartNode", wn, String.valueOf(np), "int");
+                        np = np + w.length();
+                        model.addDatatypeProperty("Gate", "hasEndNode", wn, String.valueOf(np), "int");
+
+
+                        if (wc1 == 1) {
+                            model.addObjectProperty("DocStruct", "hasFirstWord", sn, wn);
+                        } else {
+                            model.addObjectProperty("DocStruct", "hasPreviousWord", wn, wp);
+                        }
+
+                        if (wc1 == words.length) {
+                            model.addDatatypeProperty("Gate", "hasEndNode", sn, String.valueOf(np - 1), "int");
+                            model.addObjectProperty("DocStruct", "hasLastWord", sn, wn);
+                        } else {
+                            model.addObjectProperty("DocStruct", "hasNextWord", wn, we);
+                        }
+
+                        model.addDatatypeProperty("DocStruct", "hasFirstCharacter", wn, w.substring(0, 1), "str");
+
+                        log("Parsed word " + wc1);
+                        // sameAsWord
+                    }
+                }
+                int p=0;
+            }
+            log("Finished OntoParseText");
+        }
+        catch (Exception ex)
+        {
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+        }
+    }
+
+    static private boolean ontoParse(String pInputType, String pOutputType)
+    {
+        log("Started Onto Parse");
+        boolean output = false;
+        String ParseFolder = WorkFolder + File.separator + inFolder;
+        String InputType = pInputType;
+        //1 - plain text file
+        //2 - csv line per sentence with associated extra detail
+        //3 - csv two first columns are sentences to be parsed
+        String OutputType = pOutputType;
+
+        String outputFolder = ParseFolder.replace(inFolder, "5_OntoParsed");
+        inFolder = "5_OntoParsed";
+        Path p = Paths.get(outputFolder);
+
+        try {
+            if(Files.notExists(p))
+            {
+                Files.createDirectory(p);
+                log("Created directory " + p);
+            }
+
+            if(deleteFiles)
+            {
+                File f = new File(outputFolder);
+                File[] matchingFiles = f.listFiles();
+
+                if(matchingFiles!=null)
+                {
+                    int c = 0;
+                    for(File tf : matchingFiles)
+                    {
+                        tf.delete();
+                        c++;
+                    }
+                    log("Deleted " + c + " files");
+                }
+            }
 
             File f = new File(ParseFolder);
             File[] matchingFiles = f.listFiles(new FilenameFilter() {
@@ -1534,7 +1763,6 @@ class model {
         om.applyChange(addax1);
     }
 
-
     public void reasonPellet()
     {
         try {
@@ -1604,7 +1832,7 @@ class model {
             {
                 log(rule.getRuleName().toString());
                 log(rule.toString());
-                if(rule.toString().contains("Antimetabole")) {
+                if(rule.toString().contains("sameAsWord") && !rule.toString().contains("Chaismus")) {
 
                     ont.getOWLOntologyManager().addAxiom(ont, rule);
                 }
