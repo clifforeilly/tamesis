@@ -10,7 +10,7 @@ import com.clarkparsia.owlapi.explanation.PelletExplanation;
 import com.clarkparsia.owlapi.explanation.io.manchester.ManchesterSyntaxExplanationRenderer;
 import com.clarkparsia.owlapiv3.OWL;
 import com.clarkparsia.pellet.rules.model.Rule;
-import com.hp.hpl.jena.ontology.OntModel;
+//import com.hp.hpl.jena.ontology.OntModel;
 import com.hp.hpl.jena.ontology.Ontology;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
@@ -54,8 +54,14 @@ import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import static com.thargoid.Main.getNow;
 import static com.thargoid.Main.inFolder;
 import static com.thargoid.Main.log;
-import org.apache.jena.*;
-
+import org.apache.jena.ontology.OntModel;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.rdf.model.*;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
+import org.apache.jena.reasoner.rulesys.Rule;
 
 //args
 //0=process type
