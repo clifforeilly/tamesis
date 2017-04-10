@@ -1,0 +1,1238 @@
+<?xml version="1.0"?>
+<rdf:RDF xmlns="http://repositori.com/sw/onto/201702222212023.owl#"
+     xml:base="http://repositori.com/sw/onto/201702222212023.owl"
+     xmlns:p="#"
+     xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+     xmlns:owl="http://www.w3.org/2002/07/owl#"
+     xmlns:xml="http://www.w3.org/XML/1998/namespace"
+     xmlns:xsd="http://www.w3.org/2001/XMLSchema#"
+     xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#"
+     xmlns:DocStruct="http://repositori.com/sw/onto/DocStruct.owl#">
+    <owl:Ontology rdf:about="http://repositori.com/sw/onto/201702222212023.owl"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Object Properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- hasFirstSentence -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasFirstSentence"/>
+    
+
+
+    <!-- hasFirstWord -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasFirstWord"/>
+    
+
+
+    <!-- hasLastSentence -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasLastSentence"/>
+    
+
+
+    <!-- hasLastWord -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasLastWord"/>
+    
+
+
+    <!-- hasNextSentence -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasNextSentence"/>
+    
+
+
+    <!-- hasNextWord -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasNextWord"/>
+    
+
+
+    <!-- hasParagraph -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasParagraph"/>
+    
+
+
+    <!-- hasPreviousSentence -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasPreviousSentence"/>
+    
+
+
+    <!-- hasPreviousWord -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasPreviousWord"/>
+    
+
+
+    <!-- hasSentence -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasSentence"/>
+    
+
+
+    <!-- hasWord -->
+
+    <owl:ObjectProperty rdf:about="http://repositori.com/sw/onto/DocStruct.owl#hasWord"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Data properties
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- hasEndNode -->
+
+    <owl:DatatypeProperty rdf:about="#hasEndNode"/>
+    
+
+
+    <!-- hasFirstCharacter -->
+
+    <owl:DatatypeProperty rdf:about="#hasFirstCharacter"/>
+    
+
+
+    <!-- hasID -->
+
+    <owl:DatatypeProperty rdf:about="#hasID"/>
+    
+
+
+    <!-- hasStartNode -->
+
+    <owl:DatatypeProperty rdf:about="#hasStartNode"/>
+    
+
+
+    <!-- hasString -->
+
+    <owl:DatatypeProperty rdf:about="#hasString"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Classes
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- Doc -->
+
+    <owl:Class rdf:about="http://repositori.com/sw/onto/DocStruct.owl#Doc"/>
+    
+
+
+    <!-- Sentence -->
+
+    <owl:Class rdf:about="http://repositori.com/sw/onto/gate.owl#Sentence"/>
+    
+
+
+    <!-- paragraph -->
+
+    <owl:Class rdf:about="http://repositori.com/sw/onto/gate.owl#paragraph"/>
+    
+
+
+    <!-- word -->
+
+    <owl:Class rdf:about="http://repositori.com/sw/onto/gate.owl#word"/>
+    
+
+
+    <!-- 
+    ///////////////////////////////////////////////////////////////////////////////////////
+    //
+    // Individuals
+    //
+    ///////////////////////////////////////////////////////////////////////////////////////
+     -->
+
+    
+
+
+    <!-- doc -->
+
+    <owl:NamedIndividual rdf:about="#doc">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/DocStruct.owl#Doc"/>
+        <DocStruct:hasParagraph rdf:resource="#p1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- p1 -->
+
+    <owl:NamedIndividual rdf:about="#p1">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#paragraph"/>
+        <DocStruct:hasFirstSentence rdf:resource="#s1"/>
+        <DocStruct:hasLastSentence rdf:resource="#s2"/>
+        <DocStruct:hasSentence rdf:resource="#s1"/>
+        <DocStruct:hasSentence rdf:resource="#s2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- s1 -->
+
+    <owl:NamedIndividual rdf:about="#s1">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#Sentence"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">123</p:hasEndNode>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</p:hasStartNode>
+        <DocStruct:hasFirstWord rdf:resource="#w1"/>
+        <DocStruct:hasLastWord rdf:resource="#w20"/>
+        <DocStruct:hasNextSentence rdf:resource="#s2"/>
+        <DocStruct:hasWord rdf:resource="#w1"/>
+        <DocStruct:hasWord rdf:resource="#w10"/>
+        <DocStruct:hasWord rdf:resource="#w11"/>
+        <DocStruct:hasWord rdf:resource="#w12"/>
+        <DocStruct:hasWord rdf:resource="#w13"/>
+        <DocStruct:hasWord rdf:resource="#w14"/>
+        <DocStruct:hasWord rdf:resource="#w15"/>
+        <DocStruct:hasWord rdf:resource="#w16"/>
+        <DocStruct:hasWord rdf:resource="#w17"/>
+        <DocStruct:hasWord rdf:resource="#w18"/>
+        <DocStruct:hasWord rdf:resource="#w19"/>
+        <DocStruct:hasWord rdf:resource="#w2"/>
+        <DocStruct:hasWord rdf:resource="#w20"/>
+        <DocStruct:hasWord rdf:resource="#w3"/>
+        <DocStruct:hasWord rdf:resource="#w4"/>
+        <DocStruct:hasWord rdf:resource="#w5"/>
+        <DocStruct:hasWord rdf:resource="#w6"/>
+        <DocStruct:hasWord rdf:resource="#w7"/>
+        <DocStruct:hasWord rdf:resource="#w8"/>
+        <DocStruct:hasWord rdf:resource="#w9"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- s2 -->
+
+    <owl:NamedIndividual rdf:about="#s2">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#Sentence"/>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">22</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">124</p:hasStartNode>
+        <DocStruct:hasFirstWord rdf:resource="#w21"/>
+        <DocStruct:hasPreviousSentence rdf:resource="#s1"/>
+        <DocStruct:hasWord rdf:resource="#w21"/>
+        <DocStruct:hasWord rdf:resource="#w22"/>
+        <DocStruct:hasWord rdf:resource="#w23"/>
+        <DocStruct:hasWord rdf:resource="#w24"/>
+        <DocStruct:hasWord rdf:resource="#w25"/>
+        <DocStruct:hasWord rdf:resource="#w26"/>
+        <DocStruct:hasWord rdf:resource="#w27"/>
+        <DocStruct:hasWord rdf:resource="#w28"/>
+        <DocStruct:hasWord rdf:resource="#w29"/>
+        <DocStruct:hasWord rdf:resource="#w30"/>
+        <DocStruct:hasWord rdf:resource="#w31"/>
+        <DocStruct:hasWord rdf:resource="#w32"/>
+        <DocStruct:hasWord rdf:resource="#w33"/>
+        <DocStruct:hasWord rdf:resource="#w34"/>
+        <DocStruct:hasWord rdf:resource="#w35"/>
+        <DocStruct:hasWord rdf:resource="#w36"/>
+        <DocStruct:hasWord rdf:resource="#w37"/>
+        <DocStruct:hasWord rdf:resource="#w38"/>
+        <DocStruct:hasWord rdf:resource="#w39"/>
+        <DocStruct:hasWord rdf:resource="#w40"/>
+        <DocStruct:hasWord rdf:resource="#w41"/>
+        <DocStruct:hasWord rdf:resource="#w42"/>
+        <DocStruct:hasWord rdf:resource="#w43"/>
+        <DocStruct:hasWord rdf:resource="#w44"/>
+        <DocStruct:hasWord rdf:resource="#w45"/>
+        <DocStruct:hasWord rdf:resource="#w46"/>
+        <DocStruct:hasWord rdf:resource="#w47"/>
+        <DocStruct:hasWord rdf:resource="#w48"/>
+        <DocStruct:hasWord rdf:resource="#w49"/>
+        <DocStruct:hasWord rdf:resource="#w50"/>
+        <DocStruct:hasWord rdf:resource="#w51"/>
+        <DocStruct:hasWord rdf:resource="#w52"/>
+        <DocStruct:hasWord rdf:resource="#w53"/>
+        <DocStruct:hasWord rdf:resource="#w54"/>
+        <DocStruct:hasWord rdf:resource="#w55"/>
+        <DocStruct:hasWord rdf:resource="#w56"/>
+        <DocStruct:hasWord rdf:resource="#w57"/>
+        <DocStruct:hasWord rdf:resource="#w58"/>
+        <DocStruct:hasWord rdf:resource="#w59"/>
+        <DocStruct:hasWord rdf:resource="#w60"/>
+        <DocStruct:hasWord rdf:resource="#w61"/>
+        <DocStruct:hasWord rdf:resource="#w62"/>
+        <DocStruct:hasWord rdf:resource="#w63"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w1 -->
+
+    <owl:NamedIndividual rdf:about="#w1">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">A</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">2</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">1</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">Automatic</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w10 -->
+
+    <owl:NamedIndividual rdf:about="#w10">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">69</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">11</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">66</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">and</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w11"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w9"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w11 -->
+
+    <owl:NamedIndividual rdf:about="#w11">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">72</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">12</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">69</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">its</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w12"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w10"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w12 -->
+
+    <owl:NamedIndividual rdf:about="#w12">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">13</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">72</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">annotation</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w13"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w11"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w13 -->
+
+    <owl:NamedIndividual rdf:about="#w13">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">85</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">14</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">82</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">are</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w14"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w12"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w14 -->
+
+    <owl:NamedIndividual rdf:about="#w14">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">88</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">n</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">15</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">85</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">not</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w15"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w13"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w15 -->
+
+    <owl:NamedIndividual rdf:about="#w15">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">91</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">n</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">16</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">88</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">new</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w16"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w14"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w16 -->
+
+    <owl:NamedIndividual rdf:about="#w16">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">97</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">17</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">91</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">fields</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w17"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w15"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w17 -->
+
+    <owl:NamedIndividual rdf:about="#w17">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">99</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">18</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">97</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w18"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w16"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w18 -->
+
+    <owl:NamedIndividual rdf:about="#w18">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">106</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">n</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">19</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">99</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">natural</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w19"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w17"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w19 -->
+
+    <owl:NamedIndividual rdf:about="#w19">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">114</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">20</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">106</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">language</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w20"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w18"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w2 -->
+
+    <owl:NamedIndividual rdf:about="#w2">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">21</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">3</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">recognition</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w3"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w1"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w20 -->
+
+    <owl:NamedIndividual rdf:about="#w20">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">124</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">p</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">21</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">114</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">processing</p:hasString>
+        <DocStruct:hasPreviousWord rdf:resource="#w19"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w21 -->
+
+    <owl:NamedIndividual rdf:about="#w21">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">127</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">O</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">23</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">124</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">One</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w22"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w22 -->
+
+    <owl:NamedIndividual rdf:about="#w22">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">129</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">24</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">127</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w23"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w21"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w23 -->
+
+    <owl:NamedIndividual rdf:about="#w23">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">132</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">t</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">25</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">129</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">the</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w24"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w22"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w24 -->
+
+    <owl:NamedIndividual rdf:about="#w24">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">137</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">26</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">132</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">first</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w25"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w23"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w25 -->
+
+    <owl:NamedIndividual rdf:about="#w25">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">143</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">p</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">27</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">137</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">pieces</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w26"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w24"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w26 -->
+
+    <owl:NamedIndividual rdf:about="#w26">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">145</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">28</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">143</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w27"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w25"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w27 -->
+
+    <owl:NamedIndividual rdf:about="#w27">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">153</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">29</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">145</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">research</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w28"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w26"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w28 -->
+
+    <owl:NamedIndividual rdf:about="#w28">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">155</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">30</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">153</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">in</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w29"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w27"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w29 -->
+
+    <owl:NamedIndividual rdf:about="#w29">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">158</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">t</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">31</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">155</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">the</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w30"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w28"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w3 -->
+
+    <owl:NamedIndividual rdf:about="#w3">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">23</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">4</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">21</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w4"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w2"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w30 -->
+
+    <owl:NamedIndividual rdf:about="#w30">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">163</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">32</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">158</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">field</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w31"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w29"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w31 -->
+
+    <owl:NamedIndividual rdf:about="#w31">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">165</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">33</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">163</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w32"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w30"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w32 -->
+
+    <owl:NamedIndividual rdf:about="#w32">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">174</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">34</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">165</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">automatic</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w33"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w31"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w33 -->
+
+    <owl:NamedIndividual rdf:about="#w33">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">188</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">35</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">174</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">identification</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w34"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w32"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w34 -->
+
+    <owl:NamedIndividual rdf:about="#w34">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">191</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">36</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">188</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">and</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w35"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w33"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w35 -->
+
+    <owl:NamedIndividual rdf:about="#w35">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">205</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">37</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">191</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">interpretation</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w36"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w34"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w36 -->
+
+    <owl:NamedIndividual rdf:about="#w36">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">207</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">38</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">205</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w37"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w35"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w37 -->
+
+    <owl:NamedIndividual rdf:about="#w37">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">217</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">39</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">207</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">rhetorical</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w38"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w36"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w38 -->
+
+    <owl:NamedIndividual rdf:about="#w38">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">224</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">40</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">217</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">figures</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w39"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w37"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w39 -->
+
+    <owl:NamedIndividual rdf:about="#w39">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">229</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">w</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">41</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">224</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">which</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w40"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w38"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w4 -->
+
+    <owl:NamedIndividual rdf:about="#w4">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">33</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">5</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">23</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">rhetorical</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w5"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w3"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w40 -->
+
+    <owl:NamedIndividual rdf:about="#w40">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">234</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">d</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">42</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">229</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">deals</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w41"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w39"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w41 -->
+
+    <owl:NamedIndividual rdf:about="#w41">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">238</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">w</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">43</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">234</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">with</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w42"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w40"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w42 -->
+
+    <owl:NamedIndividual rdf:about="#w42">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">241</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">t</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">44</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">238</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">the</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w43"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w41"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w43 -->
+
+    <owl:NamedIndividual rdf:about="#w43">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">255</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">45</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">241</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">identification</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w44"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w42"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w44 -->
+
+    <owl:NamedIndividual rdf:about="#w44">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">257</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">o</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">46</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">255</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">of</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w45"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w43"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w45 -->
+
+    <owl:NamedIndividual rdf:about="#w45">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">265</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">47</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">257</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">anaphora</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w46"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w44"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w46 -->
+
+    <owl:NamedIndividual rdf:about="#w46">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">274</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">48</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">265</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(anaphora</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w47"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w45"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w47 -->
+
+    <owl:NamedIndividual rdf:about="#w47">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">285</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">r</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">49</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">274</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">resolution)</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w48"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w46"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w48 -->
+
+    <owl:NamedIndividual rdf:about="#w48">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">288</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">w</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">50</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">285</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">was</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w49"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w47"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w49 -->
+
+    <owl:NamedIndividual rdf:about="#w49">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">293</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">g</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">51</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">288</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">given</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w50"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w48"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w5 -->
+
+    <owl:NamedIndividual rdf:about="#w5">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">40</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">6</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">33</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">figures</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w6"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w4"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w50 -->
+
+    <owl:NamedIndividual rdf:about="#w50">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">295</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">52</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">293</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">in</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w51"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w49"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w51 -->
+
+    <owl:NamedIndividual rdf:about="#w51">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">298</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">t</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">53</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">295</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">the</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w52"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w50"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w52 -->
+
+    <owl:NamedIndividual rdf:about="#w52">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">302</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">54</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">298</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">1964</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w53"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w51"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w53 -->
+
+    <owl:NamedIndividual rdf:about="#w53">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">307</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">p</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">55</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">302</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">paper</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w54"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w52"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w54 -->
+
+    <owl:NamedIndividual rdf:about="#w54">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">309</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">�</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">56</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">307</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">�A</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w55"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w53"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w55 -->
+
+    <owl:NamedIndividual rdf:about="#w55">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">327</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">q</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">57</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">309</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">question-answering</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w56"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w54"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w56 -->
+
+    <owl:NamedIndividual rdf:about="#w56">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">333</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">s</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">58</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">327</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">system</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w57"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w55"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w57 -->
+
+    <owl:NamedIndividual rdf:about="#w57">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">336</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">f</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">59</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">333</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">for</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w58"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w56"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w58 -->
+
+    <owl:NamedIndividual rdf:about="#w58">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">340</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">h</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">60</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">336</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">high</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w59"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w57"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w59 -->
+
+    <owl:NamedIndividual rdf:about="#w59">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">346</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">s</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">61</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">340</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">school</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w60"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w58"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w6 -->
+
+    <owl:NamedIndividual rdf:about="#w6">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">51</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">7</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">40</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">(figurative</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w7"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w5"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w60 -->
+
+    <owl:NamedIndividual rdf:about="#w60">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">353</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">a</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">62</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">346</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">algebra</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w61"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w59"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w61 -->
+
+    <owl:NamedIndividual rdf:about="#w61">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">357</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">w</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">63</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">353</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">word</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w62"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w60"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w62 -->
+
+    <owl:NamedIndividual rdf:about="#w62">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">366</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">p</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">64</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">357</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">problems�</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w63"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w61"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w63 -->
+
+    <owl:NamedIndividual rdf:about="#w63">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">366</p:hasEndNode>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">65</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">366</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string"></p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w64"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w62"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w64 -->
+
+    <owl:NamedIndividual rdf:about="#w64"/>
+    
+
+
+    <!-- w7 -->
+
+    <owl:NamedIndividual rdf:about="#w7">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">60</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">l</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">8</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">51</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">language)</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w8"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w6"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w8 -->
+
+    <owl:NamedIndividual rdf:about="#w8">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">62</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">i</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">9</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">60</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">in</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w9"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w7"/>
+    </owl:NamedIndividual>
+    
+
+
+    <!-- w9 -->
+
+    <owl:NamedIndividual rdf:about="#w9">
+        <rdf:type rdf:resource="http://repositori.com/sw/onto/gate.owl#word"/>
+        <p:hasEndNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">66</p:hasEndNode>
+        <p:hasFirstCharacter rdf:datatype="http://www.w3.org/2001/XMLSchema#string">t</p:hasFirstCharacter>
+        <p:hasID rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">10</p:hasID>
+        <p:hasStartNode rdf:datatype="http://www.w3.org/2001/XMLSchema#integer">62</p:hasStartNode>
+        <p:hasString rdf:datatype="http://www.w3.org/2001/XMLSchema#string">text</p:hasString>
+        <DocStruct:hasNextWord rdf:resource="#w10"/>
+        <DocStruct:hasPreviousWord rdf:resource="#w8"/>
+    </owl:NamedIndividual>
+</rdf:RDF>
+
+
+
+<!-- Generated by the OWL API (version 4.1.0-SNAPSHOT.20150427-2201) http://owlapi.sourceforge.net -->
+
