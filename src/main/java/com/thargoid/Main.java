@@ -6,12 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import com.clarkparsia.owlapi.explanation.PelletExplanation;
-import com.clarkparsia.owlapi.explanation.io.manchester.ManchesterSyntaxExplanationRenderer;
-import com.clarkparsia.owlapiv3.OWL;
-import com.clarkparsia.pellet.rules.model.Rule;
-//import com.hp.hpl.jena.ontology.OntModel;
-import com.hp.hpl.jena.ontology.Ontology;
+//import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
@@ -21,47 +16,26 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import de.saar.coli.salsa.reiter.framenet.*;
 import de.saar.coli.salsa.reiter.framenet.FrameNet;
-import org.apache.jena.ontology.OntModelSpec;
+import org.apache.jena.ontology.*;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.semanticweb.owlapi.apibinding.OWLManager;
-import org.semanticweb.owlapi.formats.ManchesterSyntaxDocumentFormat;
-import org.semanticweb.owlapi.formats.OWLXMLDocumentFormat;
-import org.semanticweb.owlapi.formats.TurtleDocumentFormat;
-import org.semanticweb.owlapi.io.StreamDocumentTarget;
-import org.semanticweb.owlapi.io.StringDocumentSource;
-import org.semanticweb.owlapi.io.StringDocumentTarget;
 import org.semanticweb.owlapi.model.*;
-import org.semanticweb.owlapi.reasoner.*;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasoner;
-import org.semanticweb.owlapi.reasoner.structural.StructuralReasonerFactory;
-import org.semanticweb.owlapi.search.Filters;
 import org.semanticweb.owlapi.util.*;
 import org.semanticweb.owlapi.vocab.OWL2Datatype;
-import org.semanticweb.owlapi.vocab.OWLFacet;
-import org.semanticweb.owlapi.vocab.OWLRDFVocabulary;
-
-import com.google.common.base.Optional;
-
 import org.swrlapi.core.SWRLAPIRule;
 import org.swrlapi.core.SWRLRuleEngine;
 import org.swrlapi.factory.SWRLAPIFactory;
-import uk.ac.manchester.cs.owlapi.modularity.ModuleType;
-import uk.ac.manchester.cs.owlapi.modularity.SyntacticLocalityModuleExtractor;
-
-import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
-import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
-
+//import com.clarkparsia.pellet.owlapiv3.PelletReasoner;
+//import com.clarkparsia.pellet.owlapiv3.PelletReasonerFactory;
 import static com.thargoid.Main.getNow;
 import static com.thargoid.Main.inFolder;
 import static com.thargoid.Main.log;
-import org.apache.jena.ontology.OntModel;
-import org.apache.jena.ontology.Individual;
-import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModelSpec;
 import org.apache.jena.rdf.model.*;
-import org.apache.jena.reasoner.Reasoner;
-import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
-import org.apache.jena.reasoner.rulesys.Rule;
+import org.apache.jena.ontology.Individual;
+import org.apache.jena.ontology.OntClass;
+import org.apache.jena.ontology.OntModel;
+
 
 //args
 //0=process type
@@ -85,6 +59,7 @@ import org.apache.jena.reasoner.rulesys.Rule;
 
 public class Main {
 
+    static public String now;
     static private Boolean LogToFile = true;
     static private String LogFileName;
     static public String WorkFolder;
@@ -115,12 +90,13 @@ public class Main {
     //static String FrameNetFolder = "C:\\Users\\co17\\LocalStuff\\MyStuff\\Personal\\MPhil\\Framenet\\fndata-1.5\\fndata-1.5";
     static String FrameNetFolder = "D:\\LaRheto\\fndata-1.5\\fndata-1.5";
     static model model;
-    static OntModel jModel;
+    static jmodel jmodel;
 
 
 
     public static void main(String[] args) {
 
+        now = getNow();
         args2 = args;
         AbstractArgCount = 5;
         arguments = new String[AbstractArgCount][3];
@@ -273,7 +249,7 @@ public class Main {
                     setupParseLookups();
                     JontoParse("1", "1");
 
-                    WorkFolder = WorkFolder.replace(inFolder, "5_OntoParsed");
+                    WorkFolder = WorkFolder.replace(inFolder, "6_JOntoParsed");
                     //set up model here?
 
                     log("Ending Jena ontoloy population");
@@ -987,8 +963,8 @@ public class Main {
         //3 - csv two first columns are sentences to be parsed
         String OutputType = pOutputType;
 
-        String outputFolder = ParseFolder.replace(inFolder, "5_OntoParsed");
-        inFolder = "5_OntoParsed";
+        String outputFolder = ParseFolder.replace(inFolder, "6_JOntoParsed");
+        inFolder = "6_JOntoParsed";
         Path p = Paths.get(outputFolder);
 
         try {
@@ -1036,9 +1012,9 @@ public class Main {
             for(File tf : matchingFiles) {
 
                 log("Created ontology model for " + tf.getName());
-                //jModel = ModelFactory.createOntologyModel(OntModelSpec.OWL_DL_MEM, null);
 
-                model.addIndividual("DocStruct", "doc", "doc");
+                jmodel= new jmodel();
+                jmodel.addIndividual("DocStruct", "doc", "doc");
 
                 String everything;
                 log("Reading input file " + tf.getAbsolutePath());
@@ -1060,10 +1036,8 @@ public class Main {
                 log("Read file text into variable");
 
                 JontoParseText(1, everything);
-                //model.runSWRLAnaphora();
-                model.runSWRL();
-                model.reasonPellet();
-                model.outputToFile(outputFolder, tf.getName());
+                //jmodel.reasoning();
+                jmodel.outputToFile(outputFolder, tf.getName());
             }
         }
         catch(Exception ex)
@@ -1085,8 +1059,8 @@ public class Main {
             List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
             log("Created Annotation and Pipeline");
 
-            model.addIndividual("Gate", "Paragraph", "p1");
-            model.addObjectProperty("DocStruct", "hasParagraph", "doc", "p1");
+            jmodel.addIndividual("Gate", "Paragraph", "p1");
+            jmodel.addObjectProperty("doc", "hasParagraph", "p1");
 
             int id = 0;
             int sc = 0;
@@ -1100,33 +1074,33 @@ public class Main {
                 String sp = "s" + Integer.toString(sc-1);
                 String se = "s" + Integer.toString(sc+1);
 
-                model.addDatatypeProperty("Gate", "hasID", sn, String.valueOf(id), "int");
-                model.addIndividual("Gate", "Sentence", sn);
-                model.addObjectProperty("DocStruct", "hasSentence", "p1", sn);
+                jmodel.addIndividual("Gate", "Sentence", sn);
+                jmodel.addDatatypeProperty(sn, "hasID",  String.valueOf(id), "int");
+                jmodel.addObjectProperty("p1", "hasSentence", sn);
 
                 if(sc==1)
                 {
-                    model.addObjectProperty("DocStruct", "hasFirstSentence", "p1", sn);
+                    jmodel.addObjectProperty("p1", "hasFirstSentence", sn);
                 }
                 else
                 {
-                    model.addObjectProperty("DocStruct", "hasPreviousSentence", sn, sp);
+                    jmodel.addObjectProperty(sn, "hasPreviousSentence", sp);
                 }
 
 
                 if(sc==sentences.size())
                 {
-                    model.addObjectProperty("DocStruct", "hasLastSentence", "p1", sn);
+                    jmodel.addObjectProperty("p1", "hasLastSentence", sn);
                 }
                 else
                 {
-                    model.addObjectProperty("DocStruct", "hasNextSentence", sn, se);
+                    jmodel.addObjectProperty(sn, "hasNextSentence", se);
                 }
 
                 String Sx = sentence.toString();
                 String[] words = Sx.split(" ");
 
-                model.addDatatypeProperty("Gate", "hasStartNode", sn, String.valueOf(np), "int");
+                jmodel.addDatatypeProperty(sn, "hasStartNode",  String.valueOf(np), "int");
 
                 log("Parsed sentence " + sc);
                 int wc1 = 0;
@@ -1145,32 +1119,32 @@ public class Main {
                         String wn = "w" + wc;
                         String wp = "w" + Integer.toString(wc - 1);
                         String we = "w" + Integer.toString(wc + 1);
-                        model.addIndividual("Gate", "word", wn);
-                        model.addObjectProperty("DocStruct", "hasWord", sn, wn);
-                        model.addDatatypeProperty("Gate", "hasString", wn, String.valueOf(w), "str");
+                        jmodel.addIndividual("Gate", "word", wn);
+                        jmodel.addObjectProperty(sn, "hasWord", wn);
+                        jmodel.addDatatypeProperty(wn, "hasString",  String.valueOf(w), "string");
 
                         id++;
-                        model.addDatatypeProperty("Gate", "hasID", wn, String.valueOf(id), "int");
+                        jmodel.addDatatypeProperty(wn, "hasID",  String.valueOf(id), "int");
 
-                        model.addDatatypeProperty("Gate", "hasStartNode", wn, String.valueOf(np), "int");
+                        jmodel.addDatatypeProperty(wn, "hasStartNode",  String.valueOf(np), "int");
                         np = np + w.length();
-                        model.addDatatypeProperty("Gate", "hasEndNode", wn, String.valueOf(np), "int");
-
+                        jmodel.addDatatypeProperty(wn, "hasEndNode",  String.valueOf(np), "int");
 
                         if (wc1 == 1) {
-                            model.addObjectProperty("DocStruct", "hasFirstWord", sn, wn);
+                            jmodel.addObjectProperty(sn, "hasFirstWord", wn);
                         } else {
-                            model.addObjectProperty("DocStruct", "hasPreviousWord", wn, wp);
+                            jmodel.addObjectProperty(wn, "hasPreviousWord", wp);
                         }
 
                         if (wc1 == words.length) {
-                            model.addDatatypeProperty("Gate", "hasEndNode", sn, String.valueOf(np - 1), "int");
+                            jmodel.addDatatypeProperty(sn, "hasEndNode",  String.valueOf(np-1), "int");
+                            jmodel.addObjectProperty(sn, "hasLastWord", wn);
                             model.addObjectProperty("DocStruct", "hasLastWord", sn, wn);
                         } else {
-                            model.addObjectProperty("DocStruct", "hasNextWord", wn, we);
+                            jmodel.addObjectProperty(wn, "hasNextWord", we);
                         }
 
-                        model.addDatatypeProperty("DocStruct", "hasFirstCharacter", wn, w.substring(0, 1), "str");
+                        jmodel.addDatatypeProperty(wn, "hasFirstCharacter",  w.substring(0, 1), "string");
 
                         log("Parsed word " + wc1);
                         // sameAsWord
@@ -1549,6 +1523,226 @@ public class Main {
 
 }
 
+
+class jmodel{
+
+    String ns_DocStruct;
+    String ns_gate;
+    String ns_LassoingRhetoric;
+    String ns_RhetDev;
+    String ns_new;
+    OntModel mod_DocStruct;
+    OntModel mod_gate;
+    OntModel mod_LassoingRhetoric;
+    OntModel mod_RhetDev;
+    OntModel mod_new;
+    OntClass c_Doc;
+    OntClass c_Sentence;
+    OntClass c_word;
+    OntClass c_Paragraph;
+    OntClass c_RhetoricalDevice;
+    Individual i_Anaphora;
+    ObjectProperty op_hasParagraph;
+    ObjectProperty op_hasSentence;
+    ObjectProperty op_hasNextWord;
+    ObjectProperty op_hasNextSentence;
+    DatatypeProperty dp_hasID;
+    DatatypeProperty dp_hasString;
+    DatatypeProperty dp_hasStartNode;
+    DatatypeProperty dp_hasEndNode;
+    ObjectProperty op_hasFirstWord;
+    ObjectProperty op_hasRhetoricalDevice;
+    String outputformat;
+
+    public jmodel(){
+
+        try
+        {
+            ns_gate = "http://repositori.com/sw/onto/gate.owl";
+            mod_gate = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_RULE_INF);
+            mod_gate.read(ns_gate);
+
+            ns_LassoingRhetoric = "http://repositori.com/sw/onto/LassoingRhetoric.owl";
+            mod_LassoingRhetoric = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_RULE_INF);
+            mod_LassoingRhetoric.read(ns_LassoingRhetoric);
+
+            ns_DocStruct = "http://repositori.com/sw/onto/DocStruct.owl";
+            mod_DocStruct = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_RULE_INF);
+            mod_DocStruct.read(ns_DocStruct);
+
+            ns_RhetDev = "http://www.repositori.com/sw/onto/RhetoricalDevices.owl";
+            mod_RhetDev = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_RULE_INF);
+            mod_RhetDev.read(ns_RhetDev);
+
+            ns_new = "http://repositori.com/sw/onto/jj_" + Main.now + ".owl";
+            mod_new = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_RULE_INF);
+
+            outputformat = "RDF/XML-ABBREV";
+            setupClasses();
+            inFolder = "6_JOntoParsed";
+
+        }
+            catch (Exception e)
+        {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+
+
+    }
+
+    public void reasoning()
+    {
+        try
+        {
+
+        }
+                catch (Exception e)
+        {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+    }
+
+    public void addObjectProperty(String i1, String objprop, String i2)
+    {
+        Resource r1 = mod_new.getIndividual(i1);
+        Resource r2 = mod_new.getIndividual(i2);
+        mod_new.add(r1, getOntObjProp(objprop), r2);
+    }
+
+    public void addDatatypeProperty(String i1, String datprop, String i2, String LitType)
+    {
+        Resource r1 = mod_new.getIndividual(i1);
+        Literal lit = null;
+
+        if(LitType.equals("int"))
+        {
+            lit = mod_new.createTypedLiteral(i2, org.apache.jena.datatypes.xsd.XSDDatatype.XSDint);
+        }
+        else if(LitType.equals("string"))
+        {
+            lit = mod_new.createTypedLiteral(i2, org.apache.jena.datatypes.xsd.XSDDatatype.XSDstring);
+        }
+
+        mod_new.add(r1, getOntDataProp(datprop), lit);
+    }
+
+
+    public void addIndividual(String onto, String owclass, String value)
+    {
+        mod_new.createIndividual(ns_new + '#' + value, getOntClass(owclass));
+    }
+
+    public Property getOntDataProp(String type) {
+        Property r = null;
+
+        if (type.equals("hasString")) {
+            r = dp_hasString;
+        } else if (type.equals("hasID")) {
+            r = dp_hasID;
+        } else if (type.equals("hasStartNode")) {
+            r = dp_hasStartNode;
+        } else if (type.equals("hasEndNode")) {
+            r = dp_hasEndNode;
+        }
+
+        return r;
+    }
+
+    public Property getOntObjProp(String type)
+    {
+        Property r = null;
+
+        if(type.equals("hasParagraph"))
+        {
+            r = op_hasParagraph;
+        }
+        else if(type.equals("hasSentence"))
+        {
+            r = op_hasSentence;
+        }
+        else if(type.equals("hasNextWord"))
+        {
+            r = op_hasNextWord;
+        }
+        else if(type.equals("hasNextSentence"))
+        {
+            r = op_hasNextSentence;
+        }
+        else if(type.equals("hasFirstWord"))
+        {
+            r = op_hasFirstWord;
+        }
+        else if(type.equals("hasRhetoricalDevice"))
+        {
+            r = op_hasRhetoricalDevice;
+        }
+
+        return r;
+    }
+
+    public OntClass getOntClass(String type)
+    {
+        OntClass r = null;
+
+        if(type.equals("doc"))
+        {
+            r = c_Doc;
+        }
+        else if(type.equals("word"))
+        {
+            r = c_word;
+        }
+        else if(type.equals("Sentence"))
+        {
+            r = c_Sentence;
+        }
+        else if(type.equals("Paragraph"))
+        {
+            r = c_Paragraph;
+        }
+
+        return r;
+    }
+
+    public void outputToFile(String saveFolder, String fileName) {
+        try {
+            fileName = fileName.replace(".", "");
+            String u = saveFolder + File.separator + "ont_" + Main.now + "_" + fileName + ".owl";
+
+            log("Outputting file " + u);
+            FileWriter out = new FileWriter( u );
+            mod_new.write(out, outputformat);
+            out.close();
+        }
+        catch (Exception e) {
+            System.out.println("Error: " + e.toString() + " - " + e.getMessage());
+            System.out.println(e.toString());
+        }
+    }
+
+    private void setupClasses()
+    {
+        c_Doc  = mod_DocStruct.getOntClass(ns_DocStruct + "#Doc");
+        c_Sentence  = mod_gate.getOntClass(ns_gate + "#Sentence");
+        c_word  = mod_gate.getOntClass(ns_gate + "#word");
+        c_Paragraph  = mod_gate.getOntClass(ns_gate + "#Paragraph");
+        c_RhetoricalDevice  = mod_RhetDev.getOntClass(ns_RhetDev + "#RhetoricalDevice");
+        i_Anaphora = mod_RhetDev.getIndividual(ns_RhetDev + "#Anaphora");
+        op_hasParagraph = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasParagraph");
+        op_hasSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasSentence");
+        op_hasNextWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasNextWord");
+        op_hasNextSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasNextSentence");
+        dp_hasString = mod_gate.getDatatypeProperty(ns_gate + "hasString");
+        dp_hasStartNode = mod_gate.getDatatypeProperty(ns_gate + "#hasStartNode");
+        dp_hasEndNode = mod_gate.getDatatypeProperty(ns_gate + "#hasEndNode");
+        op_hasFirstWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasFirstWord");
+        op_hasRhetoricalDevice = mod_RhetDev.getObjectProperty(ns_RhetDev + "#hasRhetoricalDevice");
+    }
+
+}
+
 class model {
 
     //static String NowD;
@@ -1589,31 +1783,6 @@ class model {
     OWLDataProperty hasStartNode;
     OWLDataProperty hasEndNode;
     OWLIndividual RhetDev_Anaphora;
-
-    public OWLClass getClassType(String type)
-    {
-        OWLClass r = null;
-
-        if(type.equals("doc"))
-        {
-            r = DocStruct_doc;
-        }
-        else if(type.equals("word"))
-        {
-            r = Gate_word;
-        }
-        else if(type.equals("Sentence"))
-        {
-            r = Gate_sentence;
-        }
-        else if(type.equals("Paragraph"))
-        {
-            r = Gate_paragraph;
-        }
-
-        return r;
-    }
-
 
     public model(){
 
@@ -1675,6 +1844,30 @@ class model {
             System.out.println("Error: " + e.toString() + " - " + e.getMessage());
             System.out.println(e.toString());
         }
+    }
+
+    public OWLClass getClassType(String type)
+    {
+        OWLClass r = null;
+
+        if(type.equals("doc"))
+        {
+            r = DocStruct_doc;
+        }
+        else if(type.equals("word"))
+        {
+            r = Gate_word;
+        }
+        else if(type.equals("Sentence"))
+        {
+            r = Gate_sentence;
+        }
+        else if(type.equals("Paragraph"))
+        {
+            r = Gate_paragraph;
+        }
+
+        return r;
     }
 
     public void addIndividual(String onto, String owclass, String value)
@@ -1775,7 +1968,7 @@ class model {
             //ManchesterSyntaxExplanationRenderer renderer = new ManchesterSyntaxExplanationRenderer();
             //PrintWriter out = new PrintWriter(System.out);
             //renderer.startRendering(out);
-
+/*
             PelletReasoner reasoner = PelletReasonerFactory.getInstance().createReasoner(ont);
 
             //PelletExplanation pellex = new PelletExplanation(reasoner);
@@ -1792,8 +1985,8 @@ class model {
             reasoner.getKB().realize();
             log("Pellet consistency: " + reasoner.isConsistent());
             reasoner.getKB().printClassTree();
-            Set<Rule> rules = reasoner.getKB().getRules();
-            for (Rule r : rules) {
+            Set<com.clarkparsia.pellet.rules.model.Rule> rules = reasoner.getKB().getRules();
+            for (com.clarkparsia.pellet.rules.model.Rule r : rules) {
                 log(r.toString());
             }
             log(reasoner.getKB().getInfo());
@@ -1813,9 +2006,10 @@ class model {
             };
             generator.createAxioms(df, reasoner);
             log(generator.toString());
-            */
+
             InferredOntologyGenerator gen = new InferredOntologyGenerator(reasoner);
             gen.fillOntology(df, ont);
+            */
         }
         catch(Exception ex)
         {
@@ -1823,7 +2017,6 @@ class model {
             System.out.println(ex.toString());
         }
     }
-
 
     public void runSWRL()
     {
@@ -1925,7 +2118,6 @@ class model {
             System.out.println(e.toString());
         }
     }
-
 
     public void runSWRLAnaphora()
     {
@@ -2038,7 +2230,7 @@ class model {
     public void outputToFile(String saveFolder, String fileName) {
         try {
             fileName = fileName.replace(".", "");
-            String u = saveFolder + File.separator + "ont_" + getNow() + "_" + fileName + ".owl";
+            String u = saveFolder + File.separator + "ont_" + Main.now + "_" + fileName + ".owl";
             File f = new File(u);
             log("Outputting file " + u);
             om.saveOntology(ont, IRI.create(f.toURI()));
