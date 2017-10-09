@@ -18,6 +18,10 @@ import de.saar.coli.salsa.reiter.framenet.*;
 import de.saar.coli.salsa.reiter.framenet.FrameNet;
 import org.apache.jena.ontology.*;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.reasoner.Reasoner;
+import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
+import org.apache.jena.reasoner.rulesys.Rule;
+import org.jetbrains.annotations.NotNull;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.*;
@@ -88,7 +92,7 @@ public class Main {
     static List<String[]> FrameColumns;
     static int ColIDCount;
     //static String FrameNetFolder = "C:\\Users\\co17\\LocalStuff\\MyStuff\\Personal\\MPhil\\Framenet\\fndata-1.5\\fndata-1.5";
-    static String FrameNetFolder = "D:\\LaRheto\\fndata-1.5\\fndata-1.5";
+    static String FrameNetFolder = "E:\\LaRheto\\fndata-1.5\\fndata-1.5";
     static model model;
     static jmodel jmodel;
 
@@ -1036,7 +1040,7 @@ public class Main {
                 log("Read file text into variable");
 
                 JontoParseText(1, everything);
-                //jmodel.reasoning();
+                jmodel.reasoning();
                 jmodel.outputToFile(outputFolder, tf.getName());
             }
         }
@@ -1074,6 +1078,7 @@ public class Main {
                 String sp = "s" + Integer.toString(sc-1);
                 String se = "s" + Integer.toString(sc+1);
 
+
                 jmodel.addIndividual("Gate", "Sentence", sn);
                 jmodel.addDatatypeProperty(sn, "hasID",  String.valueOf(id), "int");
                 jmodel.addObjectProperty("p1", "hasSentence", sn);
@@ -1094,6 +1099,7 @@ public class Main {
                 }
                 else
                 {
+                    jmodel.addIndividual("Gate", "Sentence", se);
                     jmodel.addObjectProperty(sn, "hasNextSentence", se);
                 }
 
@@ -1139,8 +1145,8 @@ public class Main {
                         if (wc1 == words.length) {
                             jmodel.addDatatypeProperty(sn, "hasEndNode",  String.valueOf(np-1), "int");
                             jmodel.addObjectProperty(sn, "hasLastWord", wn);
-                            model.addObjectProperty("DocStruct", "hasLastWord", sn, wn);
                         } else {
+                            jmodel.addIndividual("Gate", "word", we);
                             jmodel.addObjectProperty(wn, "hasNextWord", we);
                         }
 
@@ -1157,6 +1163,7 @@ public class Main {
         catch (Exception ex)
         {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+            ex.printStackTrace();
         }
     }
 
@@ -1545,12 +1552,19 @@ class jmodel{
     ObjectProperty op_hasParagraph;
     ObjectProperty op_hasSentence;
     ObjectProperty op_hasNextWord;
+    ObjectProperty op_hasPreviousWord;
     ObjectProperty op_hasNextSentence;
+    ObjectProperty op_hasFirstSentence;
+    ObjectProperty op_hasPreviousSentence;
+    ObjectProperty op_hasLastSentence;
+    ObjectProperty op_hasWord;
     DatatypeProperty dp_hasID;
     DatatypeProperty dp_hasString;
     DatatypeProperty dp_hasStartNode;
     DatatypeProperty dp_hasEndNode;
+    DatatypeProperty dp_hasFirstCharacter;
     ObjectProperty op_hasFirstWord;
+    ObjectProperty op_hasLastWord;
     ObjectProperty op_hasRhetoricalDevice;
     String outputformat;
 
@@ -1595,6 +1609,37 @@ class jmodel{
     {
         try
         {
+            Reasoner reasoner = new GenericRuleReasoner(Rule.rulesFromURL("E:\\tamesis\\rules.txt"));
+            InfModel infModel = ModelFactory.createInfModel(reasoner, mod_new);
+
+            StmtIterator it = infModel.listStatements();
+
+            List<Statement> sts = new ArrayList<Statement>();
+
+            while(it.hasNext()){
+
+                Statement stmt = it.nextStatement();
+                Resource subject = stmt.getSubject();
+                Property predicate = stmt.getPredicate();
+                RDFNode object = stmt.getObject();
+
+                if(!subject.toString().contains("www.w3.org") & !predicate.toString().contains("rdf-schema#subPropertyOf") & !object.toString().contains("rdf-schema#Resource") & !object.toString().contains("rdf-syntax-ns#Property")) {
+                    log(subject.toString() + " " + predicate.toString() + " " + object.toString());
+
+                    if(!subject.toString().contains("reposito")){
+                        sts.add(stmt);
+                    }
+
+                    if(predicate.toString().contains("hasRhetoricalDevice")){
+                        sts.add(stmt);
+                    }
+
+                }
+            }
+
+            for(int h=0; h<sts.size() ; h++) {
+                mod_new.add(sts.get(h));
+            }
 
         }
                 catch (Exception e)
@@ -1606,14 +1651,14 @@ class jmodel{
 
     public void addObjectProperty(String i1, String objprop, String i2)
     {
-        Resource r1 = mod_new.getIndividual(i1);
-        Resource r2 = mod_new.getIndividual(i2);
+        Resource r1 = mod_new.getIndividual(ns_new + '#' + i1);
+        Resource r2 = mod_new.getIndividual(ns_new + '#' + i2);
         mod_new.add(r1, getOntObjProp(objprop), r2);
     }
 
     public void addDatatypeProperty(String i1, String datprop, String i2, String LitType)
     {
-        Resource r1 = mod_new.getIndividual(i1);
+        Resource r1 = mod_new.getIndividual(ns_new + '#' + i1);
         Literal lit = null;
 
         if(LitType.equals("int"))
@@ -1631,7 +1676,21 @@ class jmodel{
 
     public void addIndividual(String onto, String owclass, String value)
     {
-        mod_new.createIndividual(ns_new + '#' + value, getOntClass(owclass));
+        Iterator<Individual> i = mod_new.listIndividuals();
+        boolean exists = false;
+
+
+        while(i.hasNext()){
+
+            Individual is = i.next();
+            if(is.getLocalName().equals('#' + value)) {
+                exists = true;
+            }
+        }
+
+        if(!exists) {
+            mod_new.createIndividual(ns_new + '#' + value, getOntClass(owclass));
+        }
     }
 
     public Property getOntDataProp(String type) {
@@ -1645,8 +1704,9 @@ class jmodel{
             r = dp_hasStartNode;
         } else if (type.equals("hasEndNode")) {
             r = dp_hasEndNode;
+        } else if (type.equals("hasFirstCharacter")) {
+            r = dp_hasFirstCharacter;
         }
-
         return r;
     }
 
@@ -1662,17 +1722,41 @@ class jmodel{
         {
             r = op_hasSentence;
         }
+        else if(type.equals("hasWord"))
+        {
+            r = op_hasWord;
+        }
         else if(type.equals("hasNextWord"))
         {
             r = op_hasNextWord;
+        }
+        else if(type.equals("hasPreviousWord"))
+        {
+            r = op_hasPreviousWord;
         }
         else if(type.equals("hasNextSentence"))
         {
             r = op_hasNextSentence;
         }
+        else if(type.equals("hasFirstSentence"))
+        {
+            r = op_hasFirstSentence;
+        }
+        else if(type.equals("hasPreviousSentence"))
+        {
+            r = op_hasPreviousSentence;
+        }
+        else if(type.equals("hasLastSentence"))
+        {
+            r = op_hasLastSentence;
+        }
         else if(type.equals("hasFirstWord"))
         {
             r = op_hasFirstWord;
+        }
+        else if(type.equals("hasLastWord"))
+        {
+            r = op_hasLastWord;
         }
         else if(type.equals("hasRhetoricalDevice"))
         {
@@ -1701,6 +1785,10 @@ class jmodel{
         else if(type.equals("Paragraph"))
         {
             r = c_Paragraph;
+        }
+        else if(type.equals("Anaphore"))
+        {
+            r = c_RhetoricalDevice;
         }
 
         return r;
@@ -1733,12 +1821,21 @@ class jmodel{
         op_hasParagraph = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasParagraph");
         op_hasSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasSentence");
         op_hasNextWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasNextWord");
+        op_hasPreviousWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasPreviousWord");
+        op_hasWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasWord");
         op_hasNextSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasNextSentence");
-        dp_hasString = mod_gate.getDatatypeProperty(ns_gate + "hasString");
+        op_hasFirstSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasFirstSentence");
+        op_hasPreviousSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasPreviousSentence");
+        op_hasLastSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasLastSentence");
+        dp_hasString = mod_gate.getDatatypeProperty(ns_gate + "#hasString");
         dp_hasStartNode = mod_gate.getDatatypeProperty(ns_gate + "#hasStartNode");
         dp_hasEndNode = mod_gate.getDatatypeProperty(ns_gate + "#hasEndNode");
+        dp_hasFirstCharacter = mod_DocStruct.getDatatypeProperty(ns_DocStruct + "#hasFirstCharacter");
         op_hasFirstWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasFirstWord");
+        op_hasLastWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasLastWord");
         op_hasRhetoricalDevice = mod_RhetDev.getObjectProperty(ns_RhetDev + "#hasRhetoricalDevice");
+        dp_hasID = mod_gate.getDatatypeProperty(ns_gate + "#hasID");
+
     }
 
 }
