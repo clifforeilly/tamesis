@@ -16,6 +16,8 @@ import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
 import de.saar.coli.salsa.reiter.framenet.*;
 import de.saar.coli.salsa.reiter.framenet.FrameNet;
+import org.apache.jena.datatypes.RDFDatatype;
+import org.apache.jena.graph.Node;
 import org.apache.jena.ontology.*;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.reasoner.Reasoner;
