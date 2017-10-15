@@ -1,6 +1,8 @@
 package com.thargoid;
 
 import java.io.*;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -18,11 +20,15 @@ import de.saar.coli.salsa.reiter.framenet.*;
 import de.saar.coli.salsa.reiter.framenet.FrameNet;
 import org.apache.jena.datatypes.RDFDatatype;
 import org.apache.jena.graph.Node;
+import org.apache.jena.graph.NodeFactory;
+import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.*;
 import org.apache.jena.rdf.model.ModelFactory;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
 import org.apache.jena.reasoner.rulesys.Rule;
+import org.apache.jena.util.ResourceUtils;
+import org.apache.jena.util.iterator.ExtendedIterator;
 import org.jetbrains.annotations.NotNull;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
@@ -97,7 +103,7 @@ public class Main {
     static String FrameNetFolder = "E:\\LaRheto\\fndata-1.5\\fndata-1.5";
     static model model;
     static jmodel jmodel;
-
+    static List<String> Figures;
 
 
     public static void main(String[] args) {
@@ -146,6 +152,9 @@ public class Main {
         {
             deleteFiles = true;
         }
+
+        Figures = new ArrayList<>();
+        Figures.add("Epanaphora");
 
         String Processes = getArg("Processes");
 
@@ -1043,7 +1052,58 @@ public class Main {
 
                 JontoParseText(1, everything);
                 jmodel.reasoning();
-                jmodel.outputToFile(outputFolder, tf.getName());
+                String outputfile = jmodel.outputToFile(outputFolder, tf.getName());
+
+                Scanner fileScanner = new Scanner(new File(outputfile));
+                String line = null;
+                fileScanner.nextLine();
+                PrintWriter writer = new PrintWriter(outputfile.replace(".owl", "_2.owl"), "UTF-8");
+                int o=0;
+                while (fileScanner.hasNextLine()) {
+                    line = fileScanner.next();
+                    writer.println(line);
+                    writer.flush();
+                    o++;
+                }
+
+                writer.close();
+
+                /*
+                //Path path = Paths.get(outputfile);
+                //Charset charset = StandardCharsets.UTF_8;
+                //String content = new String(Files.readAllBytes(path), charset);
+                //String content2 = null;
+
+                Scanner fileScanner = new Scanner(new File(outputfile));
+                String line = null;
+                fileScanner.nextLine();
+
+                PrintWriter writer = new PrintWriter(outputfile, "UTF-8");
+
+                while (fileScanner.hasNextLine())
+                {
+                    line = fileScanner.next();
+
+                    if(!line.contains("</")){
+                        for(int figs=0;figs<Figures.size();figs++){
+
+                            if(line.contains(":" + Figures.get(figs) + ">")) {
+                                UUID uuid = UUID.randomUUID();
+                                String randomUUIDString = uuid.toString();
+
+                                line = line.replaceFirst(":" + Figures.get(figs) + ">", ":" + Figures.get(figs) + " rdf:resource=\"" + jmodel.ns_new + "#" + Figures.get(figs) + "_" + randomUUIDString.substring(1, 8) + "\">");
+                            }
+                        }
+                    }
+                    //content2 = content2 + line;
+                    writer.println(line);
+                }
+
+                writer.flush();
+                writer.close();
+*/
+
+                //Files.write(path, content.getBytes(content2));
             }
         }
         catch(Exception ex)
@@ -1539,7 +1599,7 @@ class jmodel{
     String ns_gate;
     String ns_LassoingRhetoric;
     String ns_RhetDev;
-    String ns_new;
+    public String ns_new;
     OntModel mod_DocStruct;
     OntModel mod_gate;
     OntModel mod_LassoingRhetoric;
@@ -1626,7 +1686,7 @@ class jmodel{
                 RDFNode object = stmt.getObject();
 
                 if(!subject.toString().contains("www.w3.org") & !predicate.toString().contains("rdf-schema#subPropertyOf") & !object.toString().contains("rdf-schema#Resource") & !object.toString().contains("rdf-syntax-ns#Property")) {
-                    log(subject.toString() + " " + predicate.toString() + " " + object.toString());
+
 
                     if(!subject.toString().contains("reposito")){
                         sts.add(stmt);
@@ -1635,6 +1695,8 @@ class jmodel{
                     if(predicate.toString().contains("hasRhetoricalDevice")){
                         sts.add(stmt);
                     }
+
+                    log(subject.toString() + " " + predicate.toString() + " " + object.toString());
 
                 }
             }
@@ -1796,20 +1858,23 @@ class jmodel{
         return r;
     }
 
-    public void outputToFile(String saveFolder, String fileName) {
+    public String outputToFile(String saveFolder, String fileName) {
+        String u="";
         try {
             fileName = fileName.replace(".", "");
-            String u = saveFolder + File.separator + "ont_" + Main.now + "_" + fileName + ".owl";
+            u = saveFolder + File.separator + "ont_" + Main.now + "_" + fileName + ".owl";
 
             log("Outputting file " + u);
             FileWriter out = new FileWriter( u );
             mod_new.write(out, outputformat);
             out.close();
+
         }
         catch (Exception e) {
             System.out.println("Error: " + e.toString() + " - " + e.getMessage());
             System.out.println(e.toString());
         }
+        return u;
     }
 
     private void setupClasses()
