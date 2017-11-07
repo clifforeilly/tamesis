@@ -11,8 +11,14 @@ import java.util.*;
 //import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.ling.IndexedWord;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
+import edu.stanford.nlp.trees.GrammaticalRelation;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations;
 import edu.stanford.nlp.util.CoreMap;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -24,6 +30,7 @@ import org.apache.jena.graph.NodeFactory;
 import org.apache.jena.graph.Triple;
 import org.apache.jena.ontology.*;
 import org.apache.jena.rdf.model.ModelFactory;
+import org.apache.jena.reasoner.Derivation;
 import org.apache.jena.reasoner.Reasoner;
 import org.apache.jena.reasoner.rulesys.GenericRuleReasoner;
 import org.apache.jena.reasoner.rulesys.Rule;
@@ -1054,56 +1061,59 @@ public class Main {
                 jmodel.reasoning();
                 String outputfile = jmodel.outputToFile(outputFolder, tf.getName());
 
-                Scanner fileScanner = new Scanner(new File(outputfile));
-                String line = null;
-                fileScanner.nextLine();
-                PrintWriter writer = new PrintWriter(outputfile.replace(".owl", "_2.owl"), "UTF-8");
-                int o=0;
-                while (fileScanner.hasNextLine()) {
-                    line = fileScanner.next();
-                    writer.println(line);
-                    writer.flush();
-                    o++;
-                }
 
-                writer.close();
+                String newfilename = outputfile.replace(".owl", "_2.owl");
+                BufferedReader bfr = null;
+                BufferedWriter bfw = null;
 
-                /*
-                //Path path = Paths.get(outputfile);
-                //Charset charset = StandardCharsets.UTF_8;
-                //String content = new String(Files.readAllBytes(path), charset);
-                //String content2 = null;
+                try{
+                    bfr = new BufferedReader(new FileReader(outputfile));
+                    bfw = new BufferedWriter(new FileWriter(newfilename));
+                    String line;
+                    while((line=bfr.readLine()) != null){
 
-                Scanner fileScanner = new Scanner(new File(outputfile));
-                String line = null;
-                fileScanner.nextLine();
+                        if(!line.contains("</")){
+                            for(int figs=0;figs<Figures.size();figs++){
 
-                PrintWriter writer = new PrintWriter(outputfile, "UTF-8");
+                                if(line.contains(":" + Figures.get(figs) + ">")) {
+                                    UUID uuid = UUID.randomUUID();
+                                    String randomUUIDString = uuid.toString();
 
-                while (fileScanner.hasNextLine())
-                {
-                    line = fileScanner.next();
-
-                    if(!line.contains("</")){
-                        for(int figs=0;figs<Figures.size();figs++){
-
-                            if(line.contains(":" + Figures.get(figs) + ">")) {
-                                UUID uuid = UUID.randomUUID();
-                                String randomUUIDString = uuid.toString();
-
-                                line = line.replaceFirst(":" + Figures.get(figs) + ">", ":" + Figures.get(figs) + " rdf:resource=\"" + jmodel.ns_new + "#" + Figures.get(figs) + "_" + randomUUIDString.substring(1, 8) + "\">");
+                                    line = line.replaceFirst(":" + Figures.get(figs) + ">", ":" + Figures.get(figs) + " rdf:resource=\"" + jmodel.ns_new + "#" + Figures.get(figs) + "_" + randomUUIDString.substring(1, 8) + "\">");
+                                }
                             }
                         }
+
+                        bfw.write(line+"\n");
+                        }
+                }
+                catch(Exception ex){
+                    log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+                }
+                finally {
+                    try {
+                        if(bfr != null)
+                            bfr.close();
                     }
-                    //content2 = content2 + line;
-                    writer.println(line);
+                    catch(IOException ex){
+                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+                    }
+
+                    try {
+                        if(bfw != null)
+                            bfw.close();
+                    }
+                    catch(IOException ex){
+                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+                    }
                 }
 
-                writer.flush();
-                writer.close();
-*/
+                File oldFile = new File(outputfile);
+                oldFile.delete();
 
-                //Files.write(path, content.getBytes(content2));
+                File newFile = new File(newfilename);
+                newFile.renameTo(oldFile);
+
             }
         }
         catch(Exception ex)
@@ -1123,6 +1133,7 @@ public class Main {
             Annotation doc = new Annotation(corpus);
             pipeline.annotate(doc);
             List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
+
             log("Created Annotation and Pipeline");
 
             jmodel.addIndividual("Gate", "Paragraph", "p1");
@@ -1134,6 +1145,62 @@ public class Main {
             int np = 1;
             for(CoreMap sentence : sentences)
             {
+                /*Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+                List<Tree> leaves = new ArrayList<>();
+                leaves = tree.getLeaves(leaves);
+                for (Tree leave : leaves) {
+                    System.out.println(tree);
+                    System.out.println("---");
+                    System.out.println(leave);
+                    System.out.println(leave.parent(tree));
+                    System.out.println((leave.parent(tree)).parent(tree));
+                }*/
+
+                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+                System.out.println(constituencyParse);
+                SemanticGraph dependencyParse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
+                System.out.println(dependencyParse.toList());
+
+                /*
+                Set<IndexedWord> iws = dependencyParse.descendants(dependencyParse.getFirstRoot());
+
+                IndexedWord p2 = null;
+                int t=0;
+                for(IndexedWord iw : iws) {
+
+                    log(iw.toString());
+
+
+                    if(t>0){
+                        log(Integer.toString(dependencyParse.commonAncestor(iw,p2)));
+                    }
+
+                    p2 = iw;
+
+                    t++;
+                }
+*/
+                IndexedWord roo = dependencyParse.getFirstRoot();
+
+                Set<IndexedWord> iws2 = dependencyParse.getChildren(dependencyParse.getFirstRoot());
+
+                IndexedWord p22 = null;
+                int t2=0;
+                for(IndexedWord iw2 : iws2) {
+
+                    log(iw2.toString());
+
+
+                    if(t2>0){
+                        log(Integer.toString(dependencyParse.commonAncestor(iw2,p22)));
+                    }
+
+                    p22 = iw2;
+
+                    t2++;
+                }
+
+
                 id++;
                 sc++;
                 String sn = "s" + sc;
@@ -1672,11 +1739,14 @@ class jmodel{
         try
         {
             Reasoner reasoner = new GenericRuleReasoner(Rule.rulesFromURL("E:\\tamesis\\rules.txt"));
+            reasoner.setDerivationLogging(true);
             InfModel infModel = ModelFactory.createInfModel(reasoner, mod_new);
 
             StmtIterator it = infModel.listStatements();
 
             List<Statement> sts = new ArrayList<Statement>();
+
+            log("List of subject, predicate and objects... ");
 
             while(it.hasNext()){
 
@@ -1699,11 +1769,18 @@ class jmodel{
                     log(subject.toString() + " " + predicate.toString() + " " + object.toString());
 
                 }
+
+
+                for (Iterator id = infModel.getDerivation(stmt); id.hasNext(); ) {
+                    Derivation deriv = (Derivation) id.next();
+                    log("Derivation:" + deriv.toString());
+                }
             }
 
             for(int h=0; h<sts.size() ; h++) {
                 mod_new.add(sts.get(h));
             }
+
 
         }
                 catch (Exception e)
