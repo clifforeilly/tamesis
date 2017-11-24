@@ -96,6 +96,10 @@ public class Main {
     static List<String> conjunctionNodeNames;
     static List<String> interjectionNodeNames;
     static List<String> pronounNodeNames;
+    static List<String> particleNodeNames;
+    static List<String> foreignwordNodeNames;
+    static List<String> cardinalnumberNodeNames;
+    static List<String> possessiveNodeNames;
     static StanfordCoreNLP pipeline;
     static int NumParsedColumns = 7;
     static String inFolder;
@@ -1145,68 +1149,11 @@ public class Main {
             int np = 1;
             for(CoreMap sentence : sentences)
             {
-                /*Tree tree = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-                List<Tree> leaves = new ArrayList<>();
-                leaves = tree.getLeaves(leaves);
-                for (Tree leave : leaves) {
-                    System.out.println(tree);
-                    System.out.println("---");
-                    System.out.println(leave);
-                    System.out.println(leave.parent(tree));
-                    System.out.println((leave.parent(tree)).parent(tree));
-                }*/
-
-                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-                System.out.println(constituencyParse);
-                SemanticGraph dependencyParse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
-                System.out.println(dependencyParse.toList());
-
-                /*
-                Set<IndexedWord> iws = dependencyParse.descendants(dependencyParse.getFirstRoot());
-
-                IndexedWord p2 = null;
-                int t=0;
-                for(IndexedWord iw : iws) {
-
-                    log(iw.toString());
-
-
-                    if(t>0){
-                        log(Integer.toString(dependencyParse.commonAncestor(iw,p2)));
-                    }
-
-                    p2 = iw;
-
-                    t++;
-                }
-*/
-                IndexedWord roo = dependencyParse.getFirstRoot();
-
-                Set<IndexedWord> iws2 = dependencyParse.getChildren(dependencyParse.getFirstRoot());
-
-                IndexedWord p22 = null;
-                int t2=0;
-                for(IndexedWord iw2 : iws2) {
-
-                    log(iw2.toString());
-
-
-                    if(t2>0){
-                        log(Integer.toString(dependencyParse.commonAncestor(iw2,p22)));
-                    }
-
-                    p22 = iw2;
-
-                    t2++;
-                }
-
-
                 id++;
                 sc++;
                 String sn = "s" + sc;
                 String sp = "s" + Integer.toString(sc-1);
                 String se = "s" + Integer.toString(sc+1);
-
 
                 jmodel.addIndividual("Gate", "Sentence", sn);
                 jmodel.addDatatypeProperty(sn, "hasID",  String.valueOf(id), "int");
@@ -1220,7 +1167,6 @@ public class Main {
                 {
                     jmodel.addObjectProperty(sn, "hasPreviousSentence", sp);
                 }
-
 
                 if(sc==sentences.size())
                 {
@@ -1239,7 +1185,7 @@ public class Main {
 
                 log("Parsed sentence " + sc);
                 int wc1 = 0;
-                for(String w : words)
+/*                for(String w : words)
                 {
                     if(w.length()>0) {
                         wc++;
@@ -1286,6 +1232,67 @@ public class Main {
                     }
                 }
                 int p=0;
+
+*/
+
+                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+                System.out.println(constituencyParse);
+                SemanticGraph dependencyParse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
+                System.out.println(dependencyParse.toList());
+
+                //List<String> deps = dependencyParse.toList().split("\n");
+
+
+                for(CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class))
+                {
+                    wc++;
+                    wc1++;
+                    String word = token.get(CoreAnnotations.TextAnnotation.class);
+                    String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+                    String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+                    String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
+                    String postype = PartOfSpeechType(pos);
+
+                    if(!word.equals(":") & !word.equals(";") & !word.equals(",") & !word.equals(".") & !word.equals("?") & !word.equals("(") & !word.equals(")")) {
+
+                        String wn = "w" + wc;
+                        String wp = "w" + Integer.toString(wc - 1);
+                        String we = "w" + Integer.toString(wc + 1);
+                        jmodel.addIndividual("Gate", "word", wn);
+                        jmodel.addObjectProperty(sn, "hasWord", wn);
+                        jmodel.addDatatypeProperty(wn, "hasString", String.valueOf(word), "string");
+
+                        id++;
+                        jmodel.addDatatypeProperty(wn, "hasID", String.valueOf(id), "int");
+
+                        jmodel.addDatatypeProperty(wn, "hasStartNode", String.valueOf(np), "int");
+                        np = np + word.length();
+                        jmodel.addDatatypeProperty(wn, "hasEndNode", String.valueOf(np), "int");
+
+                        jmodel.addObjectProperty(wn, "hasPartOfSpeech", jmodel.mod_DocStruct, jmodel.ns_DocStruct, postype);
+                        jmodel.addDatatypeProperty(wn, "hasLemma", lem, "string");
+
+                        if (wc1 == 1) {
+                            jmodel.addObjectProperty(sn, "hasFirstWord", wn);
+                        } else {
+                            jmodel.addObjectProperty(wn, "hasPreviousWord", wp);
+                        }
+
+                        if (wc1 == words.length) {
+                            jmodel.addDatatypeProperty(sn, "hasEndNode", String.valueOf(np - 1), "int");
+                            jmodel.addObjectProperty(sn, "hasLastWord", wn);
+                        } else {
+                            jmodel.addIndividual("Gate", "word", we);
+                            jmodel.addObjectProperty(wn, "hasNextWord", we);
+                        }
+
+                        jmodel.addDatatypeProperty(wn, "hasFirstCharacter", word.substring(0, 1), "string");
+
+                        log("Parsed word " + wc1);
+                    }
+                }
+                int p=0;
+
             }
             log("Finished OntoParseText");
         }
@@ -1566,9 +1573,9 @@ public class Main {
     static String PartOfSpeechType(String pos)
     {
         String type = "";
-        if(nounNodeNames.contains(pos))
+        if(pronounNodeNames.contains(pos))
         {
-            type="Noun";
+            type="Pronoun";
         }
         if(nounNodeNames.contains(pos))
         {
@@ -1601,6 +1608,22 @@ public class Main {
         if(interjectionNodeNames.contains(pos))
         {
             type="Interjection";
+        }
+        if(particleNodeNames.contains(pos))
+        {
+            type="Particle";
+        }
+        if(foreignwordNodeNames.contains(pos))
+        {
+            type="ForeignWord";
+        }
+        if(cardinalnumberNodeNames.contains(pos))
+        {
+            type="CardinalNumber";
+        }
+        if(possessiveNodeNames.contains(pos))
+        {
+            type="Possessive";
         }
 
         return type;
@@ -1637,12 +1660,16 @@ public class Main {
         adverbNodeNames.add( "RB");
         adverbNodeNames.add( "RBR");
         adverbNodeNames.add( "RBS");
+        adverbNodeNames.add( "WRB");
 
         determinerNodeNames = new ArrayList<String>();
         determinerNodeNames.add( "DT");
+        determinerNodeNames.add( "PDT");
+        determinerNodeNames.add( "WDT");
 
         prepositionNodeNames = new ArrayList<String>();
         prepositionNodeNames.add( "IN");
+        prepositionNodeNames.add( "TO");
 
         conjunctionNodeNames = new ArrayList<String>();
         conjunctionNodeNames.add( "CC");
@@ -1653,6 +1680,19 @@ public class Main {
         pronounNodeNames = new ArrayList<String>();
         pronounNodeNames.add( "PRP");
         pronounNodeNames.add( "PRP$");
+        pronounNodeNames.add( "WP");
+
+        particleNodeNames = new ArrayList<String>();
+        particleNodeNames.add( "RP");
+
+        foreignwordNodeNames = new ArrayList<String>();
+        foreignwordNodeNames.add( "FW");
+
+        cardinalnumberNodeNames = new ArrayList<String>();
+        cardinalnumberNodeNames.add( "CD");
+
+        possessiveNodeNames  = new ArrayList<String>();
+        possessiveNodeNames.add( "POS");
 
         log("Parse lookups completed");
     }
@@ -1662,21 +1702,22 @@ public class Main {
 
 class jmodel{
 
-    String ns_DocStruct;
-    String ns_gate;
-    String ns_LassoingRhetoric;
-    String ns_RhetDev;
+    public String ns_DocStruct;
+    public String ns_gate;
+    public String ns_LassoingRhetoric;
+    public String ns_RhetDev;
     public String ns_new;
-    OntModel mod_DocStruct;
-    OntModel mod_gate;
-    OntModel mod_LassoingRhetoric;
-    OntModel mod_RhetDev;
-    OntModel mod_new;
+    public OntModel mod_DocStruct;
+    public OntModel mod_gate;
+    public OntModel mod_LassoingRhetoric;
+    public OntModel mod_RhetDev;
+    public OntModel mod_new;
     OntClass c_Doc;
     OntClass c_Sentence;
     OntClass c_word;
     OntClass c_Paragraph;
     OntClass c_RhetoricalDevice;
+    public OntClass c_PartOfSpeech;
     Individual i_Anaphora;
     ObjectProperty op_hasParagraph;
     ObjectProperty op_hasSentence;
@@ -1687,11 +1728,13 @@ class jmodel{
     ObjectProperty op_hasPreviousSentence;
     ObjectProperty op_hasLastSentence;
     ObjectProperty op_hasWord;
+    ObjectProperty op_hasPartOfSpeech;
     DatatypeProperty dp_hasID;
     DatatypeProperty dp_hasString;
     DatatypeProperty dp_hasStartNode;
     DatatypeProperty dp_hasEndNode;
     DatatypeProperty dp_hasFirstCharacter;
+    DatatypeProperty dp_hasLemma;
     ObjectProperty op_hasFirstWord;
     ObjectProperty op_hasLastWord;
     ObjectProperty op_hasRhetoricalDevice;
@@ -1797,6 +1840,13 @@ class jmodel{
         mod_new.add(r1, getOntObjProp(objprop), r2);
     }
 
+    public void addObjectProperty(String i1, String objprop, OntModel om, String ns, String oc)
+    {
+        Resource r1 = mod_new.getIndividual(ns_new + '#' + i1);
+        Resource r2 = om.getIndividual(ns + '#' + oc);
+        mod_new.add(r1, getOntObjProp(objprop), r2);
+    }
+
     public void addDatatypeProperty(String i1, String datprop, String i2, String LitType)
     {
         Resource r1 = mod_new.getIndividual(ns_new + '#' + i1);
@@ -1847,7 +1897,10 @@ class jmodel{
             r = dp_hasEndNode;
         } else if (type.equals("hasFirstCharacter")) {
             r = dp_hasFirstCharacter;
+        } else if (type.equals("hasLemma")) {
+            r = dp_hasLemma;
         }
+
         return r;
     }
 
@@ -1903,6 +1956,10 @@ class jmodel{
         {
             r = op_hasRhetoricalDevice;
         }
+        else if(type.equals("hasPartOfSpeech"))
+        {
+            r = op_hasPartOfSpeech;
+        }
 
         return r;
     }
@@ -1927,9 +1984,13 @@ class jmodel{
         {
             r = c_Paragraph;
         }
-        else if(type.equals("Anaphore"))
+        else if(type.equals("Epanaphora"))
         {
             r = c_RhetoricalDevice;
+        }
+        else if(type.equals("PartOfSpeech"))
+        {
+            r = c_PartOfSpeech;
         }
 
         return r;
@@ -1961,7 +2022,8 @@ class jmodel{
         c_word  = mod_gate.getOntClass(ns_gate + "#word");
         c_Paragraph  = mod_gate.getOntClass(ns_gate + "#Paragraph");
         c_RhetoricalDevice  = mod_RhetDev.getOntClass(ns_RhetDev + "#RhetoricalDevice");
-        i_Anaphora = mod_RhetDev.getIndividual(ns_RhetDev + "#Anaphora");
+        c_PartOfSpeech  = mod_DocStruct.getOntClass(ns_DocStruct + "#PartOfSpeech");
+        i_Anaphora = mod_RhetDev.getIndividual(ns_RhetDev + "#Epanaphora");
         op_hasParagraph = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasParagraph");
         op_hasSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasSentence");
         op_hasNextWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasNextWord");
@@ -1978,8 +2040,9 @@ class jmodel{
         op_hasFirstWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasFirstWord");
         op_hasLastWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasLastWord");
         op_hasRhetoricalDevice = mod_RhetDev.getObjectProperty(ns_RhetDev + "#hasRhetoricalDevice");
+        op_hasPartOfSpeech = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasPartOfSpeech");
         dp_hasID = mod_gate.getDatatypeProperty(ns_gate + "#hasID");
-
+        dp_hasLemma = mod_DocStruct.getDatatypeProperty(ns_DocStruct + "#hasLemma");
     }
 
 }
