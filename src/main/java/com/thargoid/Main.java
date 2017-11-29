@@ -140,27 +140,22 @@ public class Main {
         arguments[4][2] = "1";
 
         WorkFolder = getArg("WorkFolder");
-        if(getArg("LogToFile").equals("0"))
-        {
+        if (getArg("LogToFile").equals("0")) {
             LogToFile = false;
-        }
-        else
-        {
+        } else {
             LogToFile = true;
         }
 
         setup();
-        for(int a = 0 ; a<args.length ; a++) {
-            if(args[a] != null && !args[a].isEmpty())
-            {
+        for (int a = 0; a < args.length; a++) {
+            if (args[a] != null && !args[a].isEmpty()) {
                 log("args[" + a + "]=" + args[a]);
             }
         }
         log("Starting Tamesis");
 
         deleteFiles = false;
-        if(getArg("DeleteFiles").equals("1"))
-        {
+        if (getArg("DeleteFiles").equals("1")) {
             deleteFiles = true;
         }
 
@@ -169,12 +164,10 @@ public class Main {
 
         String Processes = getArg("Processes");
 
-        for(int p = 0; p<Processes.length(); p++)
-        {
+        for (int p = 0; p < Processes.length(); p++) {
             char pr = Processes.charAt(p);
 
-            switch (pr)
-            {
+            switch (pr) {
                 case 'p':
 
                     //parse
@@ -188,9 +181,7 @@ public class Main {
                         setupParseLookups();
                         Parse("1", "1");
                         WorkFolder = WorkFolder.replace(inFolder, "2_parsed");
-                    }
-                    catch(Exception ex)
-                    {
+                    } catch (Exception ex) {
                         log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
                     }
                     log("Ending Parse");
@@ -210,11 +201,9 @@ public class Main {
                     log("Starting Framenet");
                     try {
                         //framenet
-                        Framer ("1");
+                        Framer("1");
                         WorkFolder = WorkFolder.replace(inFolder, "3_framed");
-                    }
-                    catch(Exception ex)
-                    {
+                    } catch (Exception ex) {
                         log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
                     }
                     log("Ending Framenet");
@@ -226,9 +215,7 @@ public class Main {
                         //wordnet
                         //Framer ("1");
                         WorkFolder = WorkFolder.replace(inFolder, "4_wordnet");
-                    }
-                    catch(Exception ex)
-                    {
+                    } catch (Exception ex) {
                         log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
                     }
                     log("Ending WordNet");
@@ -257,11 +244,11 @@ public class Main {
                     //ontology population
                     log("Starting ontoloy population");
 
-                        setupParseLookups();
-                        ontoParse("1", "1");
+                    setupParseLookups();
+                    ontoParse("1", "1");
 
-                        WorkFolder = WorkFolder.replace(inFolder, "5_OntoParsed");
-                        //set up model here?
+                    WorkFolder = WorkFolder.replace(inFolder, "5_OntoParsed");
+                    //set up model here?
 
                     log("Ending ontoloy population");
 
@@ -288,7 +275,6 @@ public class Main {
                     log("Starting inference");
 
 
-
                     log("Ending inference");
 
                     break;
@@ -301,8 +287,7 @@ public class Main {
 
     }
 
-    static private void setup()
-    {
+    static private void setup() {
         try {
             quando = getNow();
             LogFileName = WorkFolder + File.separator + "log-" + quando + ".txt";
@@ -311,32 +296,25 @@ public class Main {
             ColIDCount = 1;
             addColumnMetaData(String.valueOf(ColIDCount), "Filename");
             log("Finished setup");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
 
-    static private void teardown()
-    {
+    static private void teardown() {
         try {
 
-            for (String[] fc:FrameColumns)
-            {
-                   log("Columns exported: " + fc[0] + ": " + fc[1]);
+            for (String[] fc : FrameColumns) {
+                log("Columns exported: " + fc[0] + ": " + fc[1]);
             }
 
             log("Finished teardown");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
 
-    static private boolean Framer(String pOutputType)
-    {
+    static private boolean Framer(String pOutputType) {
         boolean output = false;
         String FramerFolder = WorkFolder + File.separator + inFolder;
         String OutputType = pOutputType;
@@ -381,19 +359,17 @@ public class Main {
 
             fn = new FrameNet();
             File fnHome = new File(FrameNetFolder);
-            DatabaseReader reader = new FNDatabaseReader15(fnHome,true);
+            DatabaseReader reader = new FNDatabaseReader15(fnHome, true);
             fn.readData(reader);
             log("Set up framenet objects with folder " + FrameNetFolder);
 
             List<String[]> LUs = new ArrayList<String[]>();
-            for(Frame fr : fn.getFrames())
-            {
-                for(LexicalUnit luv : fr.getLexicalUnits())
-                {
+            for (Frame fr : fn.getFrames()) {
+                for (LexicalUnit luv : fr.getLexicalUnits()) {
                     String[] tmpLU = new String[3];
-                    tmpLU[0]=luv.getLexemeString();
+                    tmpLU[0] = luv.getLexemeString();
                     tmpLU[1] = luv.getPartOfSpeechAbbreviation();
-                    tmpLU[2]=fr.getName();
+                    tmpLU[2] = fr.getName();
                     LUs.add(tmpLU);
                 }
             }
@@ -422,8 +398,7 @@ public class Main {
             addColumnMetaData(String.valueOf(ColIDCount), "subFrameOf");
 
             int rowcount = 0;
-            for(File tf : matchingFiles)
-            {
+            for (File tf : matchingFiles) {
                 filecount++;
                 CSVReader csvinput = new CSVReader(new FileReader(tf.getAbsolutePath()));
                 log("Reading csv file ... " + tf.getAbsolutePath());
@@ -435,54 +410,47 @@ public class Main {
                 log("New file opened ... " + newFilename);
 
                 List<String> framesSoFar = new ArrayList<String>();
-                List<String> SuppliedFramesO  = new ArrayList<String>();
+                List<String> SuppliedFramesO = new ArrayList<String>();
 
-                for(Object ob : csvinputdata)
-                {
+                for (Object ob : csvinputdata) {
                     List<String> frames = new ArrayList<String>();
-                    row=(String[]) ob;
+                    row = (String[]) ob;
                     String tLU = row[luCol];
                     String tPOS = row[posCol];
 
                     boolean init = false;
 
-                    for(String[] strlus : LUs)
-                    {
-                        if(strlus[0].trim().equals(tLU) && strlus[1].equals(tPOS))
-                        {
+                    for (String[] strlus : LUs) {
+                        if (strlus[0].trim().equals(tLU) && strlus[1].equals(tPOS)) {
                             log("Checking " + strlus[0] + ", " + strlus[1] + ", " + strlus[2]);
                             frames.add(strlus[2]);
                             log("Added frame " + strlus[2]);
                             framesSoFar.add(strlus[2]);
-                            init=true;
+                            init = true;
                         }
                     }
 
                     int colCount = 30; //row.length + parsedColumns
                     int parsedColumns = 22;
 
-                    if(init)
-                    {
+                    if (init) {
                         log("Attempting csv output - LU:" + tLU);
                         csvout.writeNext(writeFrameData(OutputType, colCount, frames, tLU, "False"));
                         rowcount++;
                         log("Written a row: " + rowcount);
-                    }
-                    else // no frames
+                    } else // no frames
                     {
                         log("No frames!");
                         rowout = new String[colCount];
                         int a = 0;
 
-                        for(String s : row)
-                        {
+                        for (String s : row) {
                             rowout[a] = s;
                             a++;
                         }
 
-                        for(int n = 0 ; n<parsedColumns ; n++)
-                        {
-                            rowout[a+n] = "";
+                        for (int n = 0; n < parsedColumns; n++) {
+                            rowout[a + n] = "";
                         }
 
                         csvout.writeNext(rowout);
@@ -497,315 +465,268 @@ public class Main {
                 csvout.close();
             }
 
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return output;
     }
 
-    static public List<String> getFrameElements(String frame)
-    {
+    static public List<String> getFrameElements(String frame) {
         List<String> outputFrameElements = new ArrayList<String>();
-        try
-        {
+        try {
             Frame f = fn.getFrame(frame);
-            for(FrameElement fe : f.getFrameElements().values())
-            {
+            for (FrameElement fe : f.getFrameElements().values()) {
                 outputFrameElements.add(fe.getName());
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
         return outputFrameElements;
     }
 
-    static public List<String> getFrameLUs(String frame)
-    {
+    static public List<String> getFrameLUs(String frame) {
         List<String> outputLUs = new ArrayList<String>();
-        try
-        {
+        try {
             Frame f = fn.getFrame(frame);
-            for(LexicalUnit lu : f.getLexicalUnits())
-            {
+            for (LexicalUnit lu : f.getLexicalUnits()) {
                 outputLUs.add(lu.getName());
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
         return outputLUs;
     }
 
-    static public String[] writeFrameData(String type, int colCount, List<String> frames, String tLU, String extraLine)
-    {
+    static public String[] writeFrameData(String type, int colCount, List<String> frames, String tLU, String extraLine) {
         //colCount = row.length + parsedColumns
-        try
-        {
-            if(type=="1")  //basic framenet spacers
+        try {
+            if (type == "1")  //basic framenet spacers
             {
                 rowout = new String[colCount];
 
-                for(int h=0 ; h<colCount ; h++)
-                {
-                    rowout[h]="";
+                for (int h = 0; h < colCount; h++) {
+                    rowout[h] = "";
                 }
 
-                for(String frnm : frames)
-                {
+                for (String frnm : frames) {
                     Frame fr = fn.getFrame(frnm);
                     int a = 0;
 
-                    if(extraLine.equals("True"))
-                    {
-                        for(String s : prevRow)
-                        {
+                    if (extraLine.equals("True")) {
+                        for (String s : prevRow) {
                             rowout[a] = s;
                             a++;
                         }
-                        rowout[prevRow.length-1]="";
-                        rowout[prevRow.length-2]="";
-                        rowout[prevRow.length-3]="";
-                        rowout[prevRow.length-4]="";
-                        rowout[prevRow.length-5]="";
-                        rowout[prevRow.length-6]="0";
-                    }
-                    else
-                    {
-                        for(String s : row)
-                        {
+                        rowout[prevRow.length - 1] = "";
+                        rowout[prevRow.length - 2] = "";
+                        rowout[prevRow.length - 3] = "";
+                        rowout[prevRow.length - 4] = "";
+                        rowout[prevRow.length - 5] = "";
+                        rowout[prevRow.length - 6] = "0";
+                    } else {
+                        for (String s : row) {
                             rowout[a] = s;
                             a++;
                         }
                     }
 
                     //add Frame name
-                    rowout[a]=rowout[a] + " " + fr.getName();
+                    rowout[a] = rowout[a] + " " + fr.getName();
                     a++;
 
 
                     //add Frame Elements
                     String FEs = "";
-                    for(String FE : getFrameElements(fr.getName()))
-                    {
+                    for (String FE : getFrameElements(fr.getName())) {
                         FEs = FEs + FE + " ";
                     }
                     FEs.trim();
-                    rowout[a]=rowout[a] + " " + FEs;
+                    rowout[a] = rowout[a] + " " + FEs;
                     a++;
 
 
                     //add Frame LUs
                     String fLUs = "";
-                    for(String fLU : getFrameLUs(fr.getName()))
-                    {
+                    for (String fLU : getFrameLUs(fr.getName())) {
                         fLUs = fLUs + fLU + " ";
                     }
                     fLUs.trim();
-                    rowout[a]=rowout[a] + " " + fLUs;
+                    rowout[a] = rowout[a] + " " + fLUs;
                     a++;
 
                     String ibFs = "";
-                    for(Frame IdF : fr.isInheritedBy())
-                    {
+                    for (Frame IdF : fr.isInheritedBy()) {
                         ibFs = ibFs + IdF + " ";
                     }
                     ibFs.trim();
-                    rowout[a]=rowout[a] + " " + ibFs;
+                    rowout[a] = rowout[a] + " " + ibFs;
                     a++;
 
                     String pFs = "";
-                    for(Frame IdF : fr.perspectivized())
-                    {
+                    for (Frame IdF : fr.perspectivized()) {
                         pFs = pFs + IdF + " ";
                     }
                     pFs.trim();
-                    rowout[a]=rowout[a] + " " + pFs;
+                    rowout[a] = rowout[a] + " " + pFs;
                     a++;
 
                     String uFs = "";
-                    for(Frame IdF : fr.uses())
-                    {
+                    for (Frame IdF : fr.uses()) {
                         uFs = uFs + IdF + " ";
                     }
                     uFs.trim();
-                    rowout[a]=rowout[a] + " " + uFs;
+                    rowout[a] = rowout[a] + " " + uFs;
                     a++;
 
                     String ubFs = "";
-                    for(Frame IdF : fr.usedBy())
-                    {
+                    for (Frame IdF : fr.usedBy()) {
                         ubFs = ubFs + IdF + " ";
                     }
                     ubFs.trim();
-                    rowout[a]=rowout[a] + " " + ubFs;
+                    rowout[a] = rowout[a] + " " + ubFs;
                     a++;
 
                     String hsfFs = "";
-                    for(Frame IdF : fr.hasSubframe())
-                    {
+                    for (Frame IdF : fr.hasSubframe()) {
                         hsfFs = hsfFs + IdF + " ";
                     }
                     hsfFs.trim();
-                    rowout[a]=rowout[a] + " " + hsfFs;
+                    rowout[a] = rowout[a] + " " + hsfFs;
                     a++;
 
 
                     String incFs = "";
-                    for(Frame IdF : fr.inchoative())
-                    {
+                    for (Frame IdF : fr.inchoative()) {
                         incFs = incFs + IdF + " ";
                     }
                     incFs.trim();
-                    rowout[a]=rowout[a] + " " + incFs;
+                    rowout[a] = rowout[a] + " " + incFs;
                     a++;
 
                     String incsFs = "";
-                    for(Frame IdF : fr.inchoativeStative())
-                    {
+                    for (Frame IdF : fr.inchoativeStative()) {
                         incsFs = incsFs + IdF + " ";
                     }
                     incsFs.trim();
-                    rowout[a]=rowout[a] + " " + incsFs;
+                    rowout[a] = rowout[a] + " " + incsFs;
                     a++;
 
                     String cauFs = "";
-                    for(Frame IdF : fr.causative())
-                    {
+                    for (Frame IdF : fr.causative()) {
                         cauFs = cauFs + IdF + " ";
                     }
                     cauFs.trim();
-                    rowout[a]=rowout[a] + " " + cauFs;
+                    rowout[a] = rowout[a] + " " + cauFs;
                     a++;
 
 
                     String caustFs = "";
-                    for(Frame IdF : fr.causativeStative())
-                    {
+                    for (Frame IdF : fr.causativeStative()) {
                         caustFs = caustFs + IdF + " ";
                     }
                     caustFs.trim();
-                    rowout[a]=rowout[a] + " " + caustFs;
+                    rowout[a] = rowout[a] + " " + caustFs;
                     a++;
 
 
                     String aifFs = "";
-                    for(Frame IdF : fr.allInheritedFrames())
-                    {
+                    for (Frame IdF : fr.allInheritedFrames()) {
                         aifFs = aifFs + IdF + " ";
                     }
                     aifFs.trim();
-                    rowout[a]=rowout[a] + " " + aifFs;
+                    rowout[a] = rowout[a] + " " + aifFs;
                     a++;
 
 
                     String aigfFs = "";
-                    for(Frame IdF : fr.allInheritingFrames())
-                    {
+                    for (Frame IdF : fr.allInheritingFrames()) {
                         aigfFs = aigfFs + IdF + " ";
                     }
                     aigfFs.trim();
-                    rowout[a]=rowout[a] + " " + aigfFs;
+                    rowout[a] = rowout[a] + " " + aigfFs;
                     a++;
 
 
                     String earFs = "";
-                    for(Frame IdF : fr.earlier())
-                    {
+                    for (Frame IdF : fr.earlier()) {
                         earFs = earFs + IdF + " ";
                     }
                     earFs.trim();
-                    rowout[a]=rowout[a] + " " + earFs;
+                    rowout[a] = rowout[a] + " " + earFs;
                     a++;
 
 
                     String ifFs = "";
-                    for(Frame IdF : fr.inheritsFrom())
-                    {
+                    for (Frame IdF : fr.inheritsFrom()) {
                         ifFs = ifFs + IdF + " ";
                     }
                     ifFs.trim();
-                    rowout[a]=rowout[a] + " " + ifFs;
+                    rowout[a] = rowout[a] + " " + ifFs;
                     a++;
 
                     String lFs = "";
-                    for(Frame IdF : fr.later())
-                    {
+                    for (Frame IdF : fr.later()) {
                         lFs = lFs + IdF + " ";
                     }
                     lFs.trim();
-                    rowout[a]=rowout[a] + " " + lFs;
+                    rowout[a] = rowout[a] + " " + lFs;
                     a++;
 
 
                     String nFs = "";
-                    for(Frame IdF : fr.neutral())
-                    {
+                    for (Frame IdF : fr.neutral()) {
                         nFs = nFs + IdF + " ";
                     }
                     nFs.trim();
-                    rowout[a]=rowout[a] + " " + nFs;
+                    rowout[a] = rowout[a] + " " + nFs;
                     a++;
 
 
                     String refFs = "";
-                    for(Frame IdF : fr.referred())
-                    {
+                    for (Frame IdF : fr.referred()) {
                         refFs = refFs + IdF + " ";
                     }
                     refFs.trim();
-                    rowout[a]=rowout[a] + " " + refFs;
+                    rowout[a] = rowout[a] + " " + refFs;
                     a++;
 
 
                     String refrFs = "";
-                    for(Frame IdF : fr.referring())
-                    {
+                    for (Frame IdF : fr.referring()) {
                         refrFs = refrFs + IdF + " ";
                     }
                     refrFs.trim();
-                    rowout[a]=rowout[a] + " " + refrFs;
+                    rowout[a] = rowout[a] + " " + refrFs;
                     a++;
 
 
                     String sfoFs = "";
-                    for(Frame IdF : fr.subframeOf())
-                    {
+                    for (Frame IdF : fr.subframeOf()) {
                         sfoFs = sfoFs + IdF + " ";
                     }
                     sfoFs.trim();
-                    rowout[a]=rowout[a] + " " + sfoFs;
+                    rowout[a] = rowout[a] + " " + sfoFs;
                     a++;
 
-                    if(extraLine.equals("True"))
-                    {
-                        rowout[a]="";
-                    }
-                    else
-                    {
-                        rowout[a]=tLU;
+                    if (extraLine.equals("True")) {
+                        rowout[a] = "";
+                    } else {
+                        rowout[a] = tLU;
                     }
                 }
             }
-            if(type=="2")  //some more advanced spacers
+            if (type == "2")  //some more advanced spacers
             {
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return rowout;
     }
 
-    static private boolean Parse(String pInputType, String pOutputType)
-    {
+    static private boolean Parse(String pInputType, String pOutputType) {
         boolean output = false;
         String ParseFolder = WorkFolder + File.separator + inFolder;
         String InputType = pInputType;
@@ -819,22 +740,18 @@ public class Main {
         Path p = Paths.get(outputFolder);
 
         try {
-            if(Files.notExists(p))
-            {
+            if (Files.notExists(p)) {
                 Files.createDirectory(p);
                 log("Created directory " + p);
             }
 
-            if(deleteFiles)
-            {
+            if (deleteFiles) {
                 File f = new File(outputFolder);
                 File[] matchingFiles = f.listFiles();
 
-                if(matchingFiles!=null)
-                {
+                if (matchingFiles != null) {
                     int c = 0;
-                    for(File tf : matchingFiles)
-                    {
+                    for (File tf : matchingFiles) {
                         tf.delete();
                         c++;
                     }
@@ -850,7 +767,7 @@ public class Main {
                 }
             });
 
-            int filecount=0;
+            int filecount = 0;
             List<String[]> Lins = new ArrayList<String[]>();
 
             Properties props = new Properties();
@@ -860,7 +777,7 @@ public class Main {
             int rowcount = 0;
             String InText = "";
 
-            for(File tf : matchingFiles) {
+            for (File tf : matchingFiles) {
                 log("Reading input file " + tf.getAbsolutePath());
                 BufferedReader br = new BufferedReader(new FileReader(tf.getAbsoluteFile()));
                 try {
@@ -885,24 +802,20 @@ public class Main {
                 String newFilename = outputFolder + File.separator + "parsed-" + tf.getName().replace("txt", "csv");
                 CSVWriter csvout = new CSVWriter(new FileWriter(newFilename));
 
-                for(String[] t : Lins)
-                {
-                    if(!t[NumParsedColumns-1].equals(".") & !t[NumParsedColumns-1].equals(",") & !t[NumParsedColumns-1].equals("!") & !t[NumParsedColumns-1].equals("?"))
-                    {
-                        if(t[6].equals("tendency"))
-                        {
+                for (String[] t : Lins) {
+                    if (!t[NumParsedColumns - 1].equals(".") & !t[NumParsedColumns - 1].equals(",") & !t[NumParsedColumns - 1].equals("!") & !t[NumParsedColumns - 1].equals("?")) {
+                        if (t[6].equals("tendency")) {
                             int y = 0;
                         }
 
                         rowout = new String[NumParsedColumns + 1];
                         int a = 0;
 
-                        rowout[a]=tf.getName();
+                        rowout[a] = tf.getName();
                         a++;
 
-                        for(String s2 : t)
-                        {
-                            rowout[a]=s2;
+                        for (String s2 : t) {
+                            rowout[a] = s2;
                             a++;
                         }
                         csvout.writeNext(rowout);
@@ -914,30 +827,25 @@ public class Main {
                 csvout.close();
 
             }
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return output;
     }
 
-    static List<String[]> parseText(int type, String corpus)
-    {
+    static List<String[]> parseText(int type, String corpus) {
         List<String[]> Louts = new ArrayList<String[]>();
-        try
-        {
+        try {
             String[] outs = null;
             Annotation doc = new Annotation(corpus);
             pipeline.annotate(doc);
             List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
 
-            int s=0;
-            for(CoreMap sentence : sentences)
-            {
+            int s = 0;
+            for (CoreMap sentence : sentences) {
                 s++;
-                int w=0;
+                int w = 0;
 
                 addColumnMetaData(String.valueOf(ColIDCount), "SentenceNumber");
                 addColumnMetaData(String.valueOf(ColIDCount), "WordNumber");
@@ -947,8 +855,7 @@ public class Main {
                 addColumnMetaData(String.valueOf(ColIDCount), "NamedEntity");
                 addColumnMetaData(String.valueOf(ColIDCount), "Lemma");
 
-                for(CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class))
-                {
+                for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                     outs = new String[NumParsedColumns];
                     w++;
                     String word = token.get(CoreAnnotations.TextAnnotation.class);
@@ -957,29 +864,26 @@ public class Main {
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
                     String postype = PartOfSpeechType(pos);
 
-                    outs[0]=String.valueOf(s);
-                    outs[1]=String.valueOf(w);
-                    outs[2]=word;
-                    outs[3]=pos;
-                    outs[4]=postype;
-                    outs[5]=ne;
-                    outs[6]=lem;
+                    outs[0] = String.valueOf(s);
+                    outs[1] = String.valueOf(w);
+                    outs[2] = word;
+                    outs[3] = pos;
+                    outs[4] = postype;
+                    outs[5] = ne;
+                    outs[6] = lem;
 
                     Louts.add(outs);
                 }
                 log("Parsed sentence ... " + sentence.toString() + "");
             }
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return Louts;
     }
 
-    static private boolean JontoParse(String pInputType, String pOutputType)
-    {
+    static private boolean JontoParse(String pInputType, String pOutputType) {
         log("Started Onto Parse");
         boolean output = false;
         String ParseFolder = WorkFolder + File.separator + inFolder;
@@ -994,22 +898,18 @@ public class Main {
         Path p = Paths.get(outputFolder);
 
         try {
-            if(Files.notExists(p))
-            {
+            if (Files.notExists(p)) {
                 Files.createDirectory(p);
                 log("Created directory " + p);
             }
 
-            if(deleteFiles)
-            {
+            if (deleteFiles) {
                 File f = new File(outputFolder);
                 File[] matchingFiles = f.listFiles();
 
-                if(matchingFiles!=null)
-                {
+                if (matchingFiles != null) {
                     int c = 0;
-                    for(File tf : matchingFiles)
-                    {
+                    for (File tf : matchingFiles) {
                         tf.delete();
                         c++;
                     }
@@ -1025,7 +925,7 @@ public class Main {
                 }
             });
 
-            int filecount=0;
+            int filecount = 0;
             List<String[]> Lins = new ArrayList<String[]>();
 
             Properties props = new Properties();
@@ -1035,11 +935,14 @@ public class Main {
             int rowcount = 0;
             String InText = "";
 
-            for(File tf : matchingFiles) {
+            for (File tf : matchingFiles) {
 
                 log("Created ontology model for " + tf.getName());
 
-                jmodel= new jmodel();
+                //"RDF/XML-ABBREV"
+                //"TURTLE"
+
+                jmodel = new jmodel("TTL");
                 jmodel.addIndividual("DocStruct", "doc", "doc");
 
                 String everything;
@@ -1065,7 +968,7 @@ public class Main {
                 jmodel.reasoning();
                 String outputfile = jmodel.outputToFile(outputFolder, tf.getName());
 
-
+/*
                 String newfilename = outputfile.replace(".owl", "_2.owl");
                 BufferedReader bfr = null;
                 BufferedWriter bfw = null;
@@ -1117,22 +1020,18 @@ public class Main {
 
                 File newFile = new File(newfilename);
                 newFile.renameTo(oldFile);
-
+*/
             }
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return output;
     }
 
-    static void JontoParseText(int type, String corpus)
-    {
+    static void JontoParseText(int type, String corpus) {
         log("Started OntoParseText");
-        try
-        {
+        try {
             String[] outs = null;
             Annotation doc = new Annotation(corpus);
             pipeline.annotate(doc);
@@ -1147,33 +1046,27 @@ public class Main {
             int sc = 0;
             int wc = 0;
             int np = 1;
-            for(CoreMap sentence : sentences)
-            {
+            int d = 0;
+            for (CoreMap sentence : sentences) {
                 id++;
                 sc++;
                 String sn = "s" + sc;
-                String sp = "s" + Integer.toString(sc-1);
-                String se = "s" + Integer.toString(sc+1);
+                String sp = "s" + Integer.toString(sc - 1);
+                String se = "s" + Integer.toString(sc + 1);
 
                 jmodel.addIndividual("Gate", "Sentence", sn);
-                jmodel.addDatatypeProperty(sn, "hasID",  String.valueOf(id), "int");
+                jmodel.addDatatypeProperty(sn, "hasID", String.valueOf(id), "int");
                 jmodel.addObjectProperty("p1", "hasSentence", sn);
 
-                if(sc==1)
-                {
+                if (sc == 1) {
                     jmodel.addObjectProperty("p1", "hasFirstSentence", sn);
-                }
-                else
-                {
+                } else {
                     jmodel.addObjectProperty(sn, "hasPreviousSentence", sp);
                 }
 
-                if(sc==sentences.size())
-                {
+                if (sc == sentences.size()) {
                     jmodel.addObjectProperty("p1", "hasLastSentence", sn);
-                }
-                else
-                {
+                } else {
                     jmodel.addIndividual("Gate", "Sentence", se);
                     jmodel.addObjectProperty(sn, "hasNextSentence", se);
                 }
@@ -1181,7 +1074,7 @@ public class Main {
                 String Sx = sentence.toString();
                 String[] words = Sx.split(" ");
 
-                jmodel.addDatatypeProperty(sn, "hasStartNode",  String.valueOf(np), "int");
+                jmodel.addDatatypeProperty(sn, "hasStartNode", String.valueOf(np), "int");
 
                 log("Parsed sentence " + sc);
                 int wc1 = 0;
@@ -1240,11 +1133,33 @@ public class Main {
                 SemanticGraph dependencyParse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
                 System.out.println(dependencyParse.toList());
 
-                //List<String> deps = dependencyParse.toList().split("\n");
+                String[] deps = dependencyParse.toList().split("\\)");
+                List<String[]> deps2 = new ArrayList<String[]>() {
+                };
 
+                for (String s : deps) {
+                    if (!s.equals("\n")) {
+                        String deprel = s.split("\\(")[0];
+                        String deprel2 = s.split("\\(")[1];
+                        String depon = deprel2.split("-")[0];
+                        String depon2 = deprel2.split("-")[1];
+                        String deponnum = depon2.split(",")[0];
+                        String deponnum2 = depon2.split(",")[1];
+                        String w1 = deprel2.split("-")[2];
 
-                for(CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class))
-                {
+                        String[] x2 = new String[3];
+
+                        x2[0] = deprel.replace("\n", "");
+                        x2[1] = deponnum.replace("\n", "");
+                        x2[2] = w1.replace("\n", "");
+
+                        deps2.add(x2);
+                    }
+                }
+
+                List<String> inds = new ArrayList<String>();
+
+                for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                     wc++;
                     wc1++;
                     String word = token.get(CoreAnnotations.TextAnnotation.class);
@@ -1253,12 +1168,16 @@ public class Main {
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
                     String postype = PartOfSpeechType(pos);
 
-                    if(!word.equals(":") & !word.equals(";") & !word.equals(",") & !word.equals(".") & !word.equals("?") & !word.equals("(") & !word.equals(")")) {
+                    String wnx = "w" + wc;
+                    inds.add(wnx);
+
+                    if (!word.equals(":") & !word.equals(";") & !word.equals(",") & !word.equals(".") & !word.equals("?") & !word.equals("(") & !word.equals(")")) {
 
                         String wn = "w" + wc;
                         String wp = "w" + Integer.toString(wc - 1);
                         String we = "w" + Integer.toString(wc + 1);
                         jmodel.addIndividual("Gate", "word", wn);
+
                         jmodel.addObjectProperty(sn, "hasWord", wn);
                         jmodel.addDatatypeProperty(wn, "hasString", String.valueOf(word), "string");
 
@@ -1291,20 +1210,27 @@ public class Main {
                         log("Parsed word " + wc1);
                     }
                 }
-                int p=0;
+                int p = 0;
+
+                for (String[] s : deps2) {
+                    d++;
+                    String dep = "d" + d;
+                    jmodel.addIndividual("DocStruct", "Dependency", dep);
+                    jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
+                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1])), "isDependentFrom", dep);
+                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2])), "isDependentTo", dep);
+                }
+
 
             }
             log("Finished OntoParseText");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
             ex.printStackTrace();
         }
     }
 
-    static private boolean ontoParse(String pInputType, String pOutputType)
-    {
+    static private boolean ontoParse(String pInputType, String pOutputType) {
         log("Started Onto Parse");
         boolean output = false;
         String ParseFolder = WorkFolder + File.separator + inFolder;
@@ -1319,22 +1245,18 @@ public class Main {
         Path p = Paths.get(outputFolder);
 
         try {
-            if(Files.notExists(p))
-            {
+            if (Files.notExists(p)) {
                 Files.createDirectory(p);
                 log("Created directory " + p);
             }
 
-            if(deleteFiles)
-            {
+            if (deleteFiles) {
                 File f = new File(outputFolder);
                 File[] matchingFiles = f.listFiles();
 
-                if(matchingFiles!=null)
-                {
+                if (matchingFiles != null) {
                     int c = 0;
-                    for(File tf : matchingFiles)
-                    {
+                    for (File tf : matchingFiles) {
                         tf.delete();
                         c++;
                     }
@@ -1350,7 +1272,7 @@ public class Main {
                 }
             });
 
-            int filecount=0;
+            int filecount = 0;
             List<String[]> Lins = new ArrayList<String[]>();
 
             Properties props = new Properties();
@@ -1360,7 +1282,7 @@ public class Main {
             int rowcount = 0;
             String InText = "";
 
-            for(File tf : matchingFiles) {
+            for (File tf : matchingFiles) {
 
                 log("Created ontology model for " + tf.getName());
                 model = new model();
@@ -1391,20 +1313,16 @@ public class Main {
                 model.reasonPellet();
                 model.outputToFile(outputFolder, tf.getName());
             }
-        }
-        catch(Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
 
         return output;
     }
 
-    static void ontoParseText(int type, String corpus)
-    {
+    static void ontoParseText(int type, String corpus) {
         log("Started OntoParseText");
-        try
-        {
+        try {
             String[] outs = null;
             Annotation doc = new Annotation(corpus);
             pipeline.annotate(doc);
@@ -1418,34 +1336,27 @@ public class Main {
             int sc = 0;
             int wc = 0;
             int np = 1;
-            for(CoreMap sentence : sentences)
-            {
+            for (CoreMap sentence : sentences) {
                 id++;
                 sc++;
                 String sn = "s" + sc;
-                String sp = "s" + Integer.toString(sc-1);
-                String se = "s" + Integer.toString(sc+1);
+                String sp = "s" + Integer.toString(sc - 1);
+                String se = "s" + Integer.toString(sc + 1);
 
                 model.addDatatypeProperty("Gate", "hasID", sn, String.valueOf(id), "int");
                 model.addIndividual("Gate", "Sentence", sn);
                 model.addObjectProperty("DocStruct", "hasSentence", "p1", sn);
 
-                if(sc==1)
-                {
+                if (sc == 1) {
                     model.addObjectProperty("DocStruct", "hasFirstSentence", "p1", sn);
-                }
-                else
-                {
+                } else {
                     model.addObjectProperty("DocStruct", "hasPreviousSentence", sn, sp);
                 }
 
 
-                if(sc==sentences.size())
-                {
+                if (sc == sentences.size()) {
                     model.addObjectProperty("DocStruct", "hasLastSentence", "p1", sn);
-                }
-                else
-                {
+                } else {
                     model.addObjectProperty("DocStruct", "hasNextSentence", sn, se);
                 }
 
@@ -1456,9 +1367,8 @@ public class Main {
 
                 log("Parsed sentence " + sc);
                 int wc1 = 0;
-                for(String w : words)
-                {
-                    if(w.length()>0) {
+                for (String w : words) {
+                    if (w.length() > 0) {
                         wc++;
                         wc1++;
                         w = w.replace(":", "");
@@ -1502,72 +1412,210 @@ public class Main {
                         // sameAsWord
                     }
                 }
-                int p=0;
+                int p = 0;
             }
             log("Finished OntoParseText");
-        }
-        catch (Exception ex)
-        {
+        } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
 
-    static void addColumnMetaData(String COlID, String Description)
-    {
+    static void addColumnMetaData(String COlID, String Description) {
         String[] Cols = {COlID, Description};
         FrameColumns.add(Cols);
         ColIDCount++;
     }
 
-    static String getNow()
-    {
+    static String getNow() {
         return new SimpleDateFormat("yyyyMMddHHmmsss").format(new Date());
     }
 
-    static public void log(String text)
-    {
-        try
-        {
-            if(LogToFile)
-            {
-                try(Writer writer = new BufferedWriter
+    static public void log(String text) {
+        try {
+            if (LogToFile) {
+                try (Writer writer = new BufferedWriter
                         (new OutputStreamWriter
                                 (new FileOutputStream(LogFileName, true), "utf-8")
                         )
-                    )
-                {
+                ) {
                     writer.write(getNow() + ":" + text + System.lineSeparator());
-                }   
+                }
             }
             System.out.println(getNow() + ":" + text);
-           
-        }
-        catch(Exception ex)
-        {
+
+        } catch (Exception ex) {
             System.out.println("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         }
     }
-    
-    static public String getArg(String arg)
-    {
+
+    static public String getArg(String arg) {
         String output = "No value set";
-        
-        for(int i = 0; i<AbstractArgCount; i++)
-        {
-            if(arguments[i][0].equals(arg))
-            {
-                if(args2.length>Integer.parseInt(arguments[i][1]))
-                {
+
+        for (int i = 0; i < AbstractArgCount; i++) {
+            if (arguments[i][0].equals(arg)) {
+                if (args2.length > Integer.parseInt(arguments[i][1])) {
                     output = args2[Integer.parseInt(arguments[i][1])];
-                }
-                else
-                {
+                } else {
                     output = arguments[i][2];
                 }
             }
         }
-        
+
         return output;
+    }
+
+    static String UniversalDependencyType(String pos)
+    {
+        String type = "";
+        if(pos.equals("acl"))
+            {
+                type = "ClausalNounModifier";
+            }
+        if(pos.equals("advcl"))
+            {
+                type = "AdverbialClauseModifier";
+            }
+        if(pos.equals("advmod"))
+            {
+                type = "AdverbialModifier";
+            }
+        if(pos.equals("amod"))
+            {
+                type = "AdjectivalModifier";
+            }
+        if(pos.equals("appos"))
+            {
+                type = "AppositionalModifier";
+            }
+        if(pos.equals("aux"))
+            {
+                type = "Auxiliary";
+            }
+        if(pos.equals("case"))
+            {
+                type = "CaseMarking";
+            }
+        if(pos.equals("cc"))
+            {
+                type = "CoordinatingConjunction";
+            }
+        if(pos.equals("ccomp"))
+            {
+                type = "ClausalComplement";
+            }
+        if(pos.equals("cc"))
+            {
+                type = "Classifier";
+            }
+        if(pos.equals("compound"))
+            {
+                type = "Compound";
+            }
+        if(pos.equals("conj"))
+            {
+                type = "Conjunct";
+            }
+        if(pos.equals("cop"))
+            {
+                type = "Copula";
+            }
+        if(pos.equals("csubj"))
+            {
+                type = "ClausalSubject";
+            }
+        if(pos.equals("dep"))
+            {
+                type = "UnspecifiedDependency";
+            }
+        if(pos.equals("det"))
+            {
+                type = "Determiner";
+            }
+        if(pos.equals("discourse"))
+            {
+                type = "DiscourseElement";
+            }
+        if(pos.equals("dislocated"))
+            {
+                type = "DislocatedElement";
+            }
+        if(pos.equals("expl"))
+            {
+                type = "Expletive";
+            }
+        if(pos.equals("fixed"))
+            {
+                type = "FixedMultiwordExpression";
+            }
+        if(pos.equals("flat"))
+            {
+                type = "FlatMultiwordExpression";
+            }
+        if(pos.equals("goeswith"))
+            {
+                type = "GoesWith";
+            }
+        if(pos.equals("iobj"))
+            {
+                type = "IndirectObject";
+            }
+        if(pos.equals("list"))
+            {
+                type = "List";
+            }
+        if(pos.equals("mark"))
+            {
+                type = "Marker";
+            }
+        if(pos.equals("nmod"))
+            {
+                type = "NominalModifier";
+            }
+        if(pos.equals("nsubj"))
+            {
+                type = "NominalSubject";
+            }
+        if(pos.equals("nummod"))
+            {
+                type = "NumericModifier";
+            }
+        if(pos.equals("obj"))
+            {
+                type = "Object";
+            }
+        if(pos.equals("obl"))
+            {
+                type = "ObliqueNominal";
+            }
+        if(pos.equals("orphan"))
+            {
+                type = "Orphan";
+            }
+        if(pos.equals("parataxis"))
+            {
+                type = "Parataxis";
+            }
+        if(pos.equals("punct"))
+            {
+                type = "Punctuation";
+            }
+        if(pos.equals("reparandum"))
+            {
+                type = "OverriddenDisfluency";
+            }
+        if(pos.equals("root"))
+            {
+                type = "Root";
+            }
+        if(pos.equals("vocative"))
+            {
+                type = "Vocative";
+            }
+        if(pos.equals("xcomp"))
+            {
+                type = "OpenClausalComplement";
+            }
+        return type;
     }
 
     static String PartOfSpeechType(String pos)
@@ -1718,6 +1766,8 @@ class jmodel{
     OntClass c_Paragraph;
     OntClass c_RhetoricalDevice;
     public OntClass c_PartOfSpeech;
+    public OntClass c_UniversalDependency;
+    public OntClass c_Dependency;
     Individual i_Anaphora;
     ObjectProperty op_hasParagraph;
     ObjectProperty op_hasSentence;
@@ -1729,6 +1779,9 @@ class jmodel{
     ObjectProperty op_hasLastSentence;
     ObjectProperty op_hasWord;
     ObjectProperty op_hasPartOfSpeech;
+    ObjectProperty op_hasUniversalDependency;
+    ObjectProperty op_isDependentTo;
+    ObjectProperty op_isDependentFrom;
     DatatypeProperty dp_hasID;
     DatatypeProperty dp_hasString;
     DatatypeProperty dp_hasStartNode;
@@ -1740,7 +1793,7 @@ class jmodel{
     ObjectProperty op_hasRhetoricalDevice;
     String outputformat;
 
-    public jmodel(){
+    public jmodel(String outputformat){
 
         try
         {
@@ -1763,7 +1816,7 @@ class jmodel{
             ns_new = "http://repositori.com/sw/onto/jj_" + Main.now + ".owl";
             mod_new = ModelFactory.createOntologyModel(OntModelSpec.OWL_MEM_RULE_INF);
 
-            outputformat = "RDF/XML-ABBREV";
+            outputformat = outputformat;
             setupClasses();
             inFolder = "6_JOntoParsed";
 
@@ -1884,6 +1937,14 @@ class jmodel{
         }
     }
 
+    public Individual getIndividual(String value) {
+        Individual i = null;
+
+        i = mod_new.getIndividual(value);
+
+        return i;
+    }
+
     public Property getOntDataProp(String type) {
         Property r = null;
 
@@ -1960,6 +2021,19 @@ class jmodel{
         {
             r = op_hasPartOfSpeech;
         }
+        else if(type.equals("hasUniversalDependency"))
+        {
+            r = op_hasUniversalDependency;
+        }
+        else if(type.equals("isDependentTo"))
+        {
+            r = op_isDependentTo;
+        }
+        else if(type.equals("isDependentFrom"))
+        {
+            r = op_isDependentFrom;
+        }
+
 
         return r;
     }
@@ -1992,6 +2066,14 @@ class jmodel{
         {
             r = c_PartOfSpeech;
         }
+        else if(type.equals("UniversalDependency"))
+        {
+            r = c_UniversalDependency;
+        }
+        else if(type.equals("Dependency"))
+        {
+            r = c_Dependency;
+        }
 
         return r;
     }
@@ -2023,6 +2105,8 @@ class jmodel{
         c_Paragraph  = mod_gate.getOntClass(ns_gate + "#Paragraph");
         c_RhetoricalDevice  = mod_RhetDev.getOntClass(ns_RhetDev + "#RhetoricalDevice");
         c_PartOfSpeech  = mod_DocStruct.getOntClass(ns_DocStruct + "#PartOfSpeech");
+        c_UniversalDependency  = mod_DocStruct.getOntClass(ns_DocStruct + "#UniversalDependency");
+        c_Dependency  = mod_DocStruct.getOntClass(ns_DocStruct + "#Dependency");
         i_Anaphora = mod_RhetDev.getIndividual(ns_RhetDev + "#Epanaphora");
         op_hasParagraph = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasParagraph");
         op_hasSentence = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasSentence");
@@ -2041,6 +2125,9 @@ class jmodel{
         op_hasLastWord = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasLastWord");
         op_hasRhetoricalDevice = mod_RhetDev.getObjectProperty(ns_RhetDev + "#hasRhetoricalDevice");
         op_hasPartOfSpeech = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasPartOfSpeech");
+        op_hasUniversalDependency = mod_DocStruct.getObjectProperty(ns_DocStruct + "#hasUniversalDependency");
+        op_isDependentTo = mod_DocStruct.getObjectProperty(ns_DocStruct + "#isDependentTo");
+        op_isDependentFrom = mod_DocStruct.getObjectProperty(ns_DocStruct + "#isDependentFrom");
         dp_hasID = mod_gate.getDatatypeProperty(ns_gate + "#hasID");
         dp_hasLemma = mod_DocStruct.getDatatypeProperty(ns_DocStruct + "#hasLemma");
     }
