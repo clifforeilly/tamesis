@@ -19,7 +19,6 @@
         <JAVADOC />
         <SOURCES>
           <root url="file://D:/LaRheto/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
-          <root url="file://D:/LaRheto/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
         </SOURCES>
         <jarDirectory url="file://D:/LaRheto/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" recursive="false" />
         <jarDirectory url="file://D:/LaRheto/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" recursive="false" type="SOURCES" />
@@ -41,7 +40,6 @@
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://D:/Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
           <root url="file://D:/Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" />
         </SOURCES>
         <jarDirectory url="file://D:/Personal/MPhil/stanford-corenlp-full-2015-12-09/stanford-corenlp-full-2015-12-09" recursive="false" />

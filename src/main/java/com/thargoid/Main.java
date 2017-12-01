@@ -1143,19 +1143,23 @@ public class Main {
                         String deprel2 = s.split("\\(")[1];
                         String depon = deprel2.split("-")[0];
                         String depon2 = deprel2.split("-")[1];
+
                         String deponnum = depon2.split(",")[0];
                         String deponnum2 = depon2.split(",")[1];
                         String w1 = deprel2.split("-")[2];
+                        String w = depon2.replace(", ", "").replace(deponnum, "");
 
-                        String[] x2 = new String[3];
+                        if (!w.equals(":") & !w.equals(";") & !w.equals(",") & !w.equals(".") & !w.equals("?") & !w.equals("(") & !w.equals(")")) {
+                            String[] x2 = new String[3];
+                            x2[0] = deprel.replace("\n", "").split(":")[0];
+                            x2[1] = deponnum.replace("\n", "");
+                            x2[2] = w1.replace("\n", "");
 
-                        x2[0] = deprel.replace("\n", "");
-                        x2[1] = deponnum.replace("\n", "");
-                        x2[2] = w1.replace("\n", "");
-
-                        deps2.add(x2);
+                            deps2.add(x2);
+                        }
                     }
                 }
+                log("deps2:" + deps2.size());
 
                 List<String> inds = new ArrayList<String>();
 
@@ -1210,6 +1214,7 @@ public class Main {
                         log("Parsed word " + wc1);
                     }
                 }
+                log("wc:" + wc);
                 int p = 0;
 
                 for (String[] s : deps2) {
@@ -1217,8 +1222,8 @@ public class Main {
                     String dep = "d" + d;
                     jmodel.addIndividual("DocStruct", "Dependency", dep);
                     jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
-                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1])), "isDependentFrom", dep);
-                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2])), "isDependentTo", dep);
+                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2])-1), "isDependentFrom", dep);
+                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1])-1), "isDependentTo", dep);
                 }
 
 
@@ -1567,6 +1572,10 @@ public class Main {
             {
                 type = "Marker";
             }
+        if(pos.equals("neg"))
+        {
+            type = "NegationModifier";
+        }
         if(pos.equals("nmod"))
             {
                 type = "NominalModifier";
