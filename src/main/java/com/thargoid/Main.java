@@ -1218,20 +1218,23 @@ public class Main {
                 int p = 0;
 
                 for (String[] s : deps2) {
-                    d++;
-                    String dep = "d" + d;
-                    jmodel.addIndividual("DocStruct", "Dependency", dep);
-                    jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
-                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2])-1), "isDependentFrom", dep);
-                    jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1])-1), "isDependentTo", dep);
+                    if(!s[0].equals("root")) {
+                        log("d:" + d + ", s[0]=" + s[0]);
+                        d++;
+                        String dep = "d" + d;
+                        jmodel.addIndividual("DocStruct", "Dependency", dep);
+                        jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
+                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2]) - 1), "isDependentFrom", dep);
+                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1]) - 1), "isDependentTo", dep);
+                    }
                 }
 
 
-            }
-            log("Finished OntoParseText");
-        } catch (Exception ex) {
-            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-            ex.printStackTrace();
+    }
+    log("Finished OntoParseText");
+} catch (Exception ex) {
+        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+        ex.printStackTrace();
         }
     }
 
@@ -1496,6 +1499,10 @@ public class Main {
             {
                 type = "Auxiliary";
             }
+        if(pos.equals("auxpass"))
+        {
+            type = "PassiveAuxiliary";
+        }
         if(pos.equals("case"))
             {
                 type = "CaseMarking";
@@ -1544,6 +1551,10 @@ public class Main {
             {
                 type = "DislocatedElement";
             }
+        if(pos.equals("dobj"))
+        {
+            type = "DirectObject";
+        }
         if(pos.equals("expl"))
             {
                 type = "Expletive";
@@ -1584,6 +1595,10 @@ public class Main {
             {
                 type = "NominalSubject";
             }
+        if(pos.equals("nsubjpass"))
+        {
+            type = "PassiveNominalSubject";
+        }
         if(pos.equals("nummod"))
             {
                 type = "NumericModifier";
