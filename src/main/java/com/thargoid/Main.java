@@ -9,9 +9,13 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 //import com.hp.hpl.jena.datatypes.xsd.XSDDatatype;
+import com.google.common.base.Functions;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.ling.IndexedWord;
+import edu.stanford.nlp.ling.LabeledWord;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
@@ -19,6 +23,8 @@ import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
 import edu.stanford.nlp.trees.GrammaticalRelation;
 import edu.stanford.nlp.trees.Tree;
 import edu.stanford.nlp.trees.TreeCoreAnnotations;
+import edu.stanford.nlp.trees.tregex.TregexMatcher;
+import edu.stanford.nlp.trees.tregex.TregexPattern;
 import edu.stanford.nlp.util.CoreMap;
 import com.opencsv.CSVReader;
 import com.opencsv.CSVWriter;
@@ -100,6 +106,8 @@ public class Main {
     static List<String> foreignwordNodeNames;
     static List<String> cardinalnumberNodeNames;
     static List<String> possessiveNodeNames;
+    static List<String> ClauseLevelNodeNames;
+    static List<String> PhraseLevelNodeNames;
     static StanfordCoreNLP pipeline;
     static int NumParsedColumns = 7;
     static String inFolder;
@@ -967,60 +975,6 @@ public class Main {
                 JontoParseText(1, everything);
                 jmodel.reasoning();
                 String outputfile = jmodel.outputToFile(outputFolder, tf.getName());
-
-/*
-                String newfilename = outputfile.replace(".owl", "_2.owl");
-                BufferedReader bfr = null;
-                BufferedWriter bfw = null;
-
-                try{
-                    bfr = new BufferedReader(new FileReader(outputfile));
-                    bfw = new BufferedWriter(new FileWriter(newfilename));
-                    String line;
-                    while((line=bfr.readLine()) != null){
-
-                        if(!line.contains("</")){
-                            for(int figs=0;figs<Figures.size();figs++){
-
-                                if(line.contains(":" + Figures.get(figs) + ">")) {
-                                    UUID uuid = UUID.randomUUID();
-                                    String randomUUIDString = uuid.toString();
-
-                                    line = line.replaceFirst(":" + Figures.get(figs) + ">", ":" + Figures.get(figs) + " rdf:resource=\"" + jmodel.ns_new + "#" + Figures.get(figs) + "_" + randomUUIDString.substring(1, 8) + "\">");
-                                }
-                            }
-                        }
-
-                        bfw.write(line+"\n");
-                        }
-                }
-                catch(Exception ex){
-                    log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-                }
-                finally {
-                    try {
-                        if(bfr != null)
-                            bfr.close();
-                    }
-                    catch(IOException ex){
-                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-                    }
-
-                    try {
-                        if(bfw != null)
-                            bfw.close();
-                    }
-                    catch(IOException ex){
-                        log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-                    }
-                }
-
-                File oldFile = new File(outputfile);
-                oldFile.delete();
-
-                File newFile = new File(newfilename);
-                newFile.renameTo(oldFile);
-*/
             }
         } catch (Exception ex) {
             log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
@@ -1028,6 +982,7 @@ public class Main {
 
         return output;
     }
+
 
     static void JontoParseText(int type, String corpus) {
         log("Started OntoParseText");
@@ -1078,90 +1033,8 @@ public class Main {
 
                 log("Parsed sentence " + sc);
                 int wc1 = 0;
-/*                for(String w : words)
-                {
-                    if(w.length()>0) {
-                        wc++;
-                        wc1++;
-                        w = w.replace(":", "");
-                        w = w.replace(";", "");
-                        w = w.replace(",", "");
-                        w = w.replace(".", "");
-                        w = w.replace("?", "");
-                        w = w.replace("(", "");
-                        w = w.replace(")", "");
-                        String wn = "w" + wc;
-                        String wp = "w" + Integer.toString(wc - 1);
-                        String we = "w" + Integer.toString(wc + 1);
-                        jmodel.addIndividual("Gate", "word", wn);
-                        jmodel.addObjectProperty(sn, "hasWord", wn);
-                        jmodel.addDatatypeProperty(wn, "hasString",  String.valueOf(w), "string");
 
-                        id++;
-                        jmodel.addDatatypeProperty(wn, "hasID",  String.valueOf(id), "int");
-
-                        jmodel.addDatatypeProperty(wn, "hasStartNode",  String.valueOf(np), "int");
-                        np = np + w.length();
-                        jmodel.addDatatypeProperty(wn, "hasEndNode",  String.valueOf(np), "int");
-
-                        if (wc1 == 1) {
-                            jmodel.addObjectProperty(sn, "hasFirstWord", wn);
-                        } else {
-                            jmodel.addObjectProperty(wn, "hasPreviousWord", wp);
-                        }
-
-                        if (wc1 == words.length) {
-                            jmodel.addDatatypeProperty(sn, "hasEndNode",  String.valueOf(np-1), "int");
-                            jmodel.addObjectProperty(sn, "hasLastWord", wn);
-                        } else {
-                            jmodel.addIndividual("Gate", "word", we);
-                            jmodel.addObjectProperty(wn, "hasNextWord", we);
-                        }
-
-                        jmodel.addDatatypeProperty(wn, "hasFirstCharacter",  w.substring(0, 1), "string");
-
-                        log("Parsed word " + wc1);
-                        // sameAsWord
-                    }
-                }
-                int p=0;
-
-*/
-
-                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-                System.out.println(constituencyParse);
-                SemanticGraph dependencyParse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
-                System.out.println(dependencyParse.toList());
-
-                String[] deps = dependencyParse.toList().split("\\)");
-                List<String[]> deps2 = new ArrayList<String[]>() {
-                };
-
-                for (String s : deps) {
-                    if (!s.equals("\n")) {
-                        String deprel = s.split("\\(")[0];
-                        String deprel2 = s.split("\\(")[1];
-                        String depon = deprel2.split("-")[0];
-                        String depon2 = deprel2.split("-")[1];
-
-                        String deponnum = depon2.split(",")[0];
-                        String deponnum2 = depon2.split(",")[1];
-                        String w1 = deprel2.split("-")[2];
-                        String w = depon2.replace(", ", "").replace(deponnum, "");
-
-                        if (!w.equals(":") & !w.equals(";") & !w.equals(",") & !w.equals(".") & !w.equals("?") & !w.equals("(") & !w.equals(")")) {
-                            String[] x2 = new String[3];
-                            x2[0] = deprel.replace("\n", "").split(":")[0];
-                            x2[1] = deponnum.replace("\n", "");
-                            x2[2] = w1.replace("\n", "");
-
-                            deps2.add(x2);
-                        }
-                    }
-                }
-                log("deps2:" + deps2.size());
-
-                List<String> inds = new ArrayList<String>();
+                List<String[]> inds = new ArrayList<String[]>();
 
                 for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                     wc++;
@@ -1172,8 +1045,12 @@ public class Main {
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
                     String postype = PartOfSpeechType(pos);
 
-                    String wnx = "w" + wc;
-                    inds.add(wnx);
+                    String[] indsx = new String[3];
+                    indsx[0] = "w" + wc;
+                    indsx[1] = word;
+                    indsx[2] = pos;
+
+                    inds.add(indsx);
 
                     if (!word.equals(":") & !word.equals(";") & !word.equals(",") & !word.equals(".") & !word.equals("?") & !word.equals("(") & !word.equals(")")) {
 
@@ -1217,6 +1094,38 @@ public class Main {
                 log("wc:" + wc);
                 int p = 0;
 
+
+                SemanticGraph dependencyParse = sentence.get(SemanticGraphCoreAnnotations.BasicDependenciesAnnotation.class);
+                System.out.println(dependencyParse.toList());
+
+                String[] deps = dependencyParse.toList().split("\\)");
+                List<String[]> deps2 = new ArrayList<String[]>() {
+                };
+
+                for (String s : deps) {
+                    if (!s.equals("\n")) {
+                        String deprel = s.split("\\(")[0];
+                        String deprel2 = s.split("\\(")[1];
+                        String depon = deprel2.split("-")[0];
+                        String depon2 = deprel2.split("-")[1];
+
+                        String deponnum = depon2.split(",")[0];
+                        String deponnum2 = depon2.split(",")[1];
+                        String w1 = deprel2.split("-")[2];
+                        String w = depon2.replace(", ", "").replace(deponnum, "");
+
+                        if (!w.equals(":") & !w.equals(";") & !w.equals(",") & !w.equals(".") & !w.equals("?") & !w.equals("(") & !w.equals(")")) {
+                            String[] x2 = new String[3];
+                            x2[0] = deprel.replace("\n", "").split(":")[0];
+                            x2[1] = deponnum.replace("\n", "");
+                            x2[2] = w1.replace("\n", "");
+
+                            deps2.add(x2);
+                        }
+                    }
+                }
+                log("deps2:" + deps2.size());
+
                 for (String[] s : deps2) {
                     if(!s[0].equals("root")) {
                         log("d:" + d + ", s[0]=" + s[0]);
@@ -1224,12 +1133,122 @@ public class Main {
                         String dep = "d" + d;
                         jmodel.addIndividual("DocStruct", "Dependency", dep);
                         jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
-                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2]) - 1), "isDependentFrom", dep);
-                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1]) - 1), "isDependentTo", dep);
+                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2]) - 1)[0], "isDependentFrom", dep);
+                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1]) - 1)[0], "isDependentTo", dep);
                     }
                 }
 
 
+                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+                System.out.println("constituencyParse" + constituencyParse);
+
+                String cp = constituencyParse.toString();
+
+                for (String x : ClauseLevelNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : nounNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : verbNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : adjectiveNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : adverbNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : determinerNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : prepositionNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : conjunctionNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : interjectionNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : pronounNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : particleNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : foreignwordNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : cardinalnumberNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : possessiveNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+                for (String x : PhraseLevelNodeNames)
+                {
+                    cp.replace("(" + x + " ", "");
+                }
+
+
+                log(cp);
+
+                /*
+                List<String> result = new ArrayList<>();
+                TregexPattern pattern = TregexPattern.compile("@SBAR");
+                TregexMatcher matcher = pattern.matcher(constituencyParse);
+                while (matcher.find()) {
+                    Tree match = matcher.getMatch();
+
+                    List<Tree> leaves = match.getLeaves();
+
+                    System.out.println("leaves:" + leaves);
+
+                    // need a way to get the the index of the leaf word!
+
+                    for (String[] s : inds) {
+                        //??
+                    }
+
+                    String nounPhrase = Joiner.on(' ').join(Lists.transform(leaves, Functions.toStringFunction()));
+                    result.add(nounPhrase);
+                    List<LabeledWord> labeledYield = match.labeledYield();
+                    System.out.println("labeledYield: " + labeledYield);
+                }
+
+                for (String s : result) {
+                    log(s);
+                }
+                */
     }
     log("Finished OntoParseText");
 } catch (Exception ex) {
@@ -1765,6 +1784,36 @@ public class Main {
 
         possessiveNodeNames  = new ArrayList<String>();
         possessiveNodeNames.add( "POS");
+
+        ClauseLevelNodeNames = new ArrayList<String>();
+        ClauseLevelNodeNames.add("S");
+        ClauseLevelNodeNames.add("SBAR");
+        ClauseLevelNodeNames.add("SBARQ");
+        ClauseLevelNodeNames.add("SINV");
+        ClauseLevelNodeNames.add("SQ");
+
+        PhraseLevelNodeNames = new ArrayList<String>();
+        PhraseLevelNodeNames.add("ADJP");
+        PhraseLevelNodeNames.add("ADVP");
+        PhraseLevelNodeNames.add("CONJP");
+        PhraseLevelNodeNames.add("FRAG");
+        PhraseLevelNodeNames.add("INTJ");
+        PhraseLevelNodeNames.add("LST");
+        PhraseLevelNodeNames.add("NAC");
+        PhraseLevelNodeNames.add("NP");
+        PhraseLevelNodeNames.add("NX");
+        PhraseLevelNodeNames.add("PP");
+        PhraseLevelNodeNames.add("PRN");
+        PhraseLevelNodeNames.add("PRT");
+        PhraseLevelNodeNames.add("QP");
+        PhraseLevelNodeNames.add("RRC");
+        PhraseLevelNodeNames.add("UCP");
+        PhraseLevelNodeNames.add("VP");
+        PhraseLevelNodeNames.add("WHADJP");
+        PhraseLevelNodeNames.add("WHAVP");
+        PhraseLevelNodeNames.add("WHNP");
+        PhraseLevelNodeNames.add("WHPP");
+        PhraseLevelNodeNames.add("X");
 
         log("Parse lookups completed");
     }
