@@ -12,10 +12,9 @@ import java.util.*;
 import com.google.common.base.Functions;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
-import edu.stanford.nlp.ling.CoreAnnotations;
-import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.ling.IndexedWord;
-import edu.stanford.nlp.ling.LabeledWord;
+import edu.stanford.nlp.dcoref.CorefChain;
+import edu.stanford.nlp.dcoref.CorefCoreAnnotations;
+import edu.stanford.nlp.ling.*;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.semgraph.SemanticGraph;
@@ -43,6 +42,7 @@ import org.apache.jena.reasoner.rulesys.Rule;
 import org.apache.jena.util.ResourceUtils;
 import org.apache.jena.util.iterator.ExtendedIterator;
 import org.jetbrains.annotations.NotNull;
+import org.obolibrary.oboformat.model.Clause;
 import org.semanticweb.owlapi.apibinding.OWLManager;
 import org.semanticweb.owlapi.model.*;
 import org.semanticweb.owlapi.util.*;
@@ -60,6 +60,15 @@ import org.apache.jena.rdf.model.*;
 import org.apache.jena.ontology.Individual;
 import org.apache.jena.ontology.OntClass;
 import org.apache.jena.ontology.OntModel;
+
+import edu.stanford.nlp.ling.*;
+import edu.stanford.nlp.pipeline.*;
+import edu.stanford.nlp.trees.Tree;
+import edu.stanford.nlp.trees.TreeCoreAnnotations;
+import edu.stanford.nlp.util.*;
+import edu.stanford.nlp.semgraph.SemanticGraph;
+import edu.stanford.nlp.semgraph.SemanticGraphCoreAnnotations;
+import edu.stanford.nlp.semgraph.SemanticGraphEdge;
 
 
 //args
@@ -937,7 +946,7 @@ public class Main {
             List<String[]> Lins = new ArrayList<String[]>();
 
             Properties props = new Properties();
-            props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse");
+            props.put("annotators", "tokenize, ssplit, pos, lemma, ner, parse, depparse, dcoref");
             pipeline = new StanfordCoreNLP(props);
 
             int rowcount = 0;
@@ -984,10 +993,74 @@ public class Main {
     }
 
 
+    static void JontoParseText2(int type, String corpus) {
+        log("Started OntoParseText2");
+
+        try {
+            Annotation doc = new Annotation(corpus);
+            pipeline.annotate(doc);
+
+
+
+
+            log("Finished OntoParseText2");
+        } catch (Exception ex) {
+            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
+            ex.printStackTrace();
+        }
+
+    }
+
+    static public ArrayList<ClauseX> getClauses(Tree t)
+    {
+        ArrayList<ClauseX> retList = new ArrayList<ClauseX>();
+        for(Tree subTree: t)
+        {
+            if(subTree.label().value().equals("S"))
+            {
+                for(Tree tree:subTree.children())
+                {
+                    retList.add(getLeavesOfRoot(tree));
+                }
+                break;
+            }
+        }
+        return retList;
+    }
+
+    static public ClauseX getLeavesOfRoot(Tree tree)
+    {
+        ArrayList<Word> retList = new ArrayList<Word>();
+        for(Tree t: tree.getLeaves())
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value()));
+        return new ClauseX(retList, tree.label().value());
+    }
+
+    static public ArrayList<Word> getWordList(Tree t)
+    {
+        ArrayList<Word> retList = new ArrayList<Word>();
+        for(Tree tree:t.getLeaves())
+        {
+            retList.add(new Word(tree.label().value(), tree.parent(t).label().value()));
+        }
+        return retList;
+    }
+
+    static public ArrayList<GrammarRelation> getRelationList(SemanticGraph s)
+    {
+        ArrayList<GrammarRelation> retList = new ArrayList<GrammarRelation>();
+        for(SemanticGraphEdge e:s.edgeListSorted())
+        {
+            retList.add(new GrammarRelation(new Word(e.getGovernor().value(), e.getGovernor().tag()), new Word(e.getDependent().value(), e.getDependent().tag()), e.getRelation().toString()));
+            //System.out.println(e.getRelation().toString());
+        }
+        return retList;
+    }
+
     static void JontoParseText(int type, String corpus) {
         log("Started OntoParseText");
         try {
-            String[] outs = null;
+            //String[] outs = null;
             Annotation doc = new Annotation(corpus);
             pipeline.annotate(doc);
             List<CoreMap> sentences = doc.get(CoreAnnotations.SentencesAnnotation.class);
@@ -1036,6 +1109,16 @@ public class Main {
 
                 List<String[]> inds = new ArrayList<String[]>();
 
+
+                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
+                System.out.println("constituencyParse" + constituencyParse);
+                ArrayList<ClauseX> c = getClauses(constituencyParse);
+                ArrayList<Word> wordz = getWordList(constituencyParse);
+                SemanticGraph sg = sentence.get(SemanticGraphCoreAnnotations.CollapsedCCProcessedDependenciesAnnotation.class);
+                ArrayList<GrammarRelation> relations = getRelationList(sg);
+                //sents.add(new Sentence(words, relations, c));
+
+
                 for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                     wc++;
                     wc1++;
@@ -1043,6 +1126,9 @@ public class Main {
                     String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
                     String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
+
+                    
+
                     String postype = PartOfSpeechType(pos);
 
                     String[] indsx = new String[3];
@@ -1138,7 +1224,7 @@ public class Main {
                     }
                 }
 
-
+            /*
                 Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
                 System.out.println("constituencyParse" + constituencyParse);
 
@@ -1222,6 +1308,8 @@ public class Main {
 
                 log(cp);
 
+            */
+
                 /*
                 List<String> result = new ArrayList<>();
                 TregexPattern pattern = TregexPattern.compile("@SBAR");
@@ -1251,7 +1339,7 @@ public class Main {
                 */
     }
     log("Finished OntoParseText");
-} catch (Exception ex) {
+    } catch (Exception ex) {
         log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
         ex.printStackTrace();
         }
@@ -2205,6 +2293,78 @@ class jmodel{
         dp_hasLemma = mod_DocStruct.getDatatypeProperty(ns_DocStruct + "#hasLemma");
     }
 
+}
+
+class Word {
+    public String word;
+    public String gramClass;
+
+    Word()
+    {
+        word="";
+        gramClass="";
+    }
+
+    Word(String w, String g)
+    {
+        word = w;
+        gramClass = g;
+    }
+
+    public String toString() {
+        return word + "(" + gramClass + ")";
+    }
+
+}
+
+class GrammarRelation {
+    public Word word1;
+    public Word word2;
+    public String relation;
+
+    GrammarRelation(Word w1, Word w2, String r)
+    {
+        word1 = w1;
+        word2 = w2;
+        relation = r;
+    }
+
+    public boolean hasWord1(String w1, String name)
+    {
+        if(w1.toLowerCase().equals(word1.word.toLowerCase()))
+            if(name.equals(relation))
+                return true;
+        return false;
+    }
+
+    public boolean hasWord2(String w2, String name)
+    {
+        if(w2.toLowerCase().equals(word2.word.toLowerCase()))
+            if(name.equals(relation))
+                return true;
+        return false;
+    }
+
+    public String toString() {
+        return word1 + " with " + word2 + " has relation " + relation;
+    }
+
+}
+
+class ClauseX {
+    public ArrayList<Word> words;
+    public String clauseName;
+
+    ClauseX(ArrayList<Word> list, String name)
+    {
+        words = list;
+        clauseName = name;
+    }
+
+    public ArrayList<Word> getWords()
+    {
+        return words;
+    }
 }
 
 class model {
