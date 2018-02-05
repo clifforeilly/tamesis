@@ -1011,6 +1011,40 @@ public class Main {
 
     }
 
+    static public ArrayList<VerbPhrase> getVerbPhrases(Tree t)
+    {
+        ArrayList<VerbPhrase> retList = new ArrayList<VerbPhrase>();
+        for(Tree subTree: t)
+        {
+            if(subTree.label().value().equals("VP"))
+            {
+                for(Tree tree:subTree.children())
+                {
+                    retList.add(getVerbPhraseLeavesOfRoot(tree));
+                }
+                break;
+            }
+        }
+        return retList;
+    }
+
+    static public ArrayList<NounPhrase> getNounPhrases(Tree t)
+    {
+        ArrayList<NounPhrase> retList = new ArrayList<NounPhrase>();
+        for(Tree subTree: t)
+        {
+            if(subTree.label().value().equals("NP"))
+            {
+                for(Tree tree:subTree.children())
+                {
+                    retList.add(getNounPhraseLeavesOfRoot(tree));
+                }
+                break;
+            }
+        }
+        return retList;
+    }
+
     static public ArrayList<ClauseX> getClauses(Tree t)
     {
         ArrayList<ClauseX> retList = new ArrayList<ClauseX>();
@@ -1026,6 +1060,26 @@ public class Main {
             }
         }
         return retList;
+    }
+
+    static public VerbPhrase getVerbPhraseLeavesOfRoot(Tree tree)
+    {
+        ArrayList<Word> retList = new ArrayList<Word>();
+        for(Tree t: tree.getLeaves()) {
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value()));
+        }
+        return new VerbPhrase(retList, tree.label().value());
+    }
+
+    static public NounPhrase getNounPhraseLeavesOfRoot(Tree tree)
+    {
+        ArrayList<Word> retList = new ArrayList<Word>();
+        for(Tree t: tree.getLeaves()) {
+            log(String.valueOf(t.nodeNumber(t)));
+            log(String.valueOf(t.nodeNumber(tree)));
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value()));
+        }
+        return new NounPhrase(retList, tree.label().value());
     }
 
     static public ClauseX getLeavesOfRoot(Tree tree)
@@ -1118,6 +1172,19 @@ public class Main {
                 ArrayList<GrammarRelation> relations = getRelationList(sg);
                 //sents.add(new Sentence(words, relations, c));
 
+                ArrayList<NounPhrase> nps = getNounPhrases(constituencyParse);
+                ArrayList<VerbPhrase> vps = getVerbPhrases(constituencyParse);
+
+                /*
+                List<Tree> lt = constituencyParse.getLeaves();
+
+                for (int tt=0;tt<lt.size();tt++) {
+                    Tree t2 = lt.get(tt);
+                    log(t2.toString());
+                    //Tree t3 = t2.parent();
+                    //log(t3.toString());
+                }
+                */
 
                 for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                     wc++;
@@ -1127,7 +1194,7 @@ public class Main {
                     String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
 
-                    
+
 
                     String postype = PartOfSpeechType(pos);
 
@@ -2349,6 +2416,38 @@ class GrammarRelation {
         return word1 + " with " + word2 + " has relation " + relation;
     }
 
+}
+
+class VerbPhrase {
+    public ArrayList<Word> words;
+    public String clauseName;
+
+    VerbPhrase(ArrayList<Word> list, String name)
+    {
+        words = list;
+        clauseName = name;
+    }
+
+    public ArrayList<Word> getWords()
+    {
+        return words;
+    }
+}
+
+class NounPhrase {
+    public ArrayList<Word> words;
+    public String clauseName;
+
+    NounPhrase(ArrayList<Word> list, String name)
+    {
+        words = list;
+        clauseName = name;
+    }
+
+    public ArrayList<Word> getWords()
+    {
+        return words;
+    }
 }
 
 class ClauseX {
