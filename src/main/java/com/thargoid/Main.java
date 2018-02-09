@@ -982,7 +982,7 @@ public class Main {
                 log("Read file text into variable");
 
                 JontoParseText(1, everything);
-                jmodel.reasoning();
+                //jmodel.reasoning();
                 String outputfile = jmodel.outputToFile(outputFolder, tf.getName());
             }
         } catch (Exception ex) {
@@ -993,22 +993,21 @@ public class Main {
     }
 
 
-    static void JontoParseText2(int type, String corpus) {
-        log("Started OntoParseText2");
-
-        try {
-            Annotation doc = new Annotation(corpus);
-            pipeline.annotate(doc);
 
 
 
-
-            log("Finished OntoParseText2");
-        } catch (Exception ex) {
-            log("Error:-" + ex.toString() + ", " + ex.getMessage() + ", " + ex.getLocalizedMessage());
-            ex.printStackTrace();
+    static public ArrayList<int[]> getAllLeaves(Tree t)
+    {
+        ArrayList<int[]> retList = new ArrayList<int[]>();
+        for(Tree subTree: t)
+        {
+            for(Tree tree:subTree.children())
+            {
+                retList.add(getAllLeavesOfRoot(tree));
+            }
+            break;
         }
-
+        return retList;
     }
 
     static public ArrayList<VerbPhrase> getVerbPhrases(Tree t)
@@ -1061,6 +1060,19 @@ public class Main {
         }
         return retList;
     }
+
+    static public ArrayList<int[]> getAllLeavesOfRoot(Tree tree)
+    {
+        ArrayList<int[]> retList = new ArrayList<int[]>();
+
+        for(Tree t: tree.getLeaves()) {
+            int[] ti = new int[1];
+            ti[0]=t.nodeNumber(tree);
+            retList.add(ti);
+        }
+        return retList;
+    }
+
 
     static public VerbPhrase getVerbPhraseLeavesOfRoot(Tree tree)
     {
@@ -1164,6 +1176,11 @@ public class Main {
                 List<String[]> inds = new ArrayList<String[]>();
 
 
+                // set up contituencyparse list with word number and tree number
+                // create lists of clauses and phrases
+
+
+
                 Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
                 System.out.println("constituencyParse" + constituencyParse);
                 ArrayList<ClauseX> c = getClauses(constituencyParse);
@@ -1175,16 +1192,8 @@ public class Main {
                 ArrayList<NounPhrase> nps = getNounPhrases(constituencyParse);
                 ArrayList<VerbPhrase> vps = getVerbPhrases(constituencyParse);
 
-                /*
-                List<Tree> lt = constituencyParse.getLeaves();
 
-                for (int tt=0;tt<lt.size();tt++) {
-                    Tree t2 = lt.get(tt);
-                    log(t2.toString());
-                    //Tree t3 = t2.parent();
-                    //log(t3.toString());
-                }
-                */
+
 
                 for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                     wc++;
@@ -1193,8 +1202,6 @@ public class Main {
                     String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
                     String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
-
-
 
                     String postype = PartOfSpeechType(pos);
 
@@ -1205,7 +1212,7 @@ public class Main {
 
                     inds.add(indsx);
 
-                    if (!word.equals(":") & !word.equals(";") & !word.equals(",") & !word.equals(".") & !word.equals("?") & !word.equals("(") & !word.equals(")")) {
+                    if (!word.equals("!") & !word.equals("-LRB-") & !word.equals("-RRB-") & !word.equals(":") & !word.equals(";") & !word.equals(",") & !word.equals(".") & !word.equals("?") & !word.equals("(") & !word.equals(")")) {
 
                         String wn = "w" + wc;
                         String wp = "w" + Integer.toString(wc - 1);
@@ -1259,15 +1266,15 @@ public class Main {
                     if (!s.equals("\n")) {
                         String deprel = s.split("\\(")[0];
                         String deprel2 = s.split("\\(")[1];
-                        String depon = deprel2.split("-")[0];
+                        //String depon = deprel2.split("-")[0];
                         String depon2 = deprel2.split("-")[1];
 
                         String deponnum = depon2.split(",")[0];
-                        String deponnum2 = depon2.split(",")[1];
-                        String w1 = deprel2.split("-")[2];
+                        //String deponnum2 = depon2.split(",")[1];
+                        String w1 = deprel2.replace("-LRB-", "LRB").replace("-RRB-", "RRB").split("-")[2];
                         String w = depon2.replace(", ", "").replace(deponnum, "");
 
-                        if (!w.equals(":") & !w.equals(";") & !w.equals(",") & !w.equals(".") & !w.equals("?") & !w.equals("(") & !w.equals(")")) {
+                        if (!w.equals("!") & !w.equals("-LRB-") & !w.equals("-RRB-") & !w.equals(":") & !w.equals(";") & !w.equals(",") & !w.equals(".") & !w.equals("?") & !w.equals("(") & !w.equals(")")) {
                             String[] x2 = new String[3];
                             x2[0] = deprel.replace("\n", "").split(":")[0];
                             x2[1] = deponnum.replace("\n", "");
@@ -1281,129 +1288,18 @@ public class Main {
 
                 for (String[] s : deps2) {
                     if(!s[0].equals("root")) {
-                        log("d:" + d + ", s[0]=" + s[0]);
-                        d++;
-                        String dep = "d" + d;
-                        jmodel.addIndividual("DocStruct", "Dependency", dep);
-                        jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
-                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2]) - 1)[0], "isDependentFrom", dep);
-                        jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1]) - 1)[0], "isDependentTo", dep);
+                        if(!s[2].equals("LRB") & !s[2].equals("RRB")) {
+                            log("d:" + d + ", s[0]=" + s[0]);
+                            d++;
+                            String dep = "d" + d;
+                            jmodel.addIndividual("DocStruct", "Dependency", dep);
+                            jmodel.addObjectProperty(dep, "hasUniversalDependency", jmodel.mod_DocStruct, jmodel.ns_DocStruct, UniversalDependencyType(s[0]));
+                            jmodel.addObjectProperty(inds.get(Integer.parseInt(s[2]) - 1)[0], "isDependentFrom", dep);
+                            jmodel.addObjectProperty(inds.get(Integer.parseInt(s[1]) - 1)[0], "isDependentTo", dep);
+                        }
                     }
                 }
 
-            /*
-                Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
-                System.out.println("constituencyParse" + constituencyParse);
-
-                String cp = constituencyParse.toString();
-
-                for (String x : ClauseLevelNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : nounNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : verbNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : adjectiveNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : adverbNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : determinerNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : prepositionNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : conjunctionNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : interjectionNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : pronounNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : particleNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : foreignwordNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : cardinalnumberNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : possessiveNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-                for (String x : PhraseLevelNodeNames)
-                {
-                    cp.replace("(" + x + " ", "");
-                }
-
-
-                log(cp);
-
-            */
-
-                /*
-                List<String> result = new ArrayList<>();
-                TregexPattern pattern = TregexPattern.compile("@SBAR");
-                TregexMatcher matcher = pattern.matcher(constituencyParse);
-                while (matcher.find()) {
-                    Tree match = matcher.getMatch();
-
-                    List<Tree> leaves = match.getLeaves();
-
-                    System.out.println("leaves:" + leaves);
-
-                    // need a way to get the the index of the leaf word!
-
-                    for (String[] s : inds) {
-                        //??
-                    }
-
-                    String nounPhrase = Joiner.on(' ').join(Lists.transform(leaves, Functions.toStringFunction()));
-                    result.add(nounPhrase);
-                    List<LabeledWord> labeledYield = match.labeledYield();
-                    System.out.println("labeledYield: " + labeledYield);
-                }
-
-                for (String s : result) {
-                    log(s);
-                }
-                */
     }
     log("Finished OntoParseText");
     } catch (Exception ex) {
