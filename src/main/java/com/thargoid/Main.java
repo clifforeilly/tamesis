@@ -1001,11 +1001,16 @@ public class Main {
         ArrayList<int[]> retList = new ArrayList<int[]>();
         for(Tree subTree: t)
         {
-            for(Tree tree:subTree.children())
-            {
-                retList.add(getAllLeavesOfRoot(tree));
+            if(subTree.label().value().equals("NP") | subTree.label().value().equals("VP") | subTree.label().value().equals("S")) {
+                for (Tree tree : subTree.children()) {
+                    ArrayList<int[]> tt = new ArrayList<int[]>();
+                    tt = getAllLeavesOfRoot(tree);
+                    for (int[] x : tt) {
+                        retList.add(x);
+                    }
+                }
+                break;
             }
-            break;
         }
         return retList;
     }
@@ -1064,10 +1069,12 @@ public class Main {
     static public ArrayList<int[]> getAllLeavesOfRoot(Tree tree)
     {
         ArrayList<int[]> retList = new ArrayList<int[]>();
-
+        int mainc = 0;
         for(Tree t: tree.getLeaves()) {
-            int[] ti = new int[1];
+            mainc++;
+            int[] ti = new int[2];
             ti[0]=t.nodeNumber(tree);
+            ti[1]=mainc;
             retList.add(ti);
         }
         return retList;
@@ -1078,7 +1085,7 @@ public class Main {
     {
         ArrayList<Word> retList = new ArrayList<Word>();
         for(Tree t: tree.getLeaves()) {
-            retList.add(new Word(t.label().value(), t.parent(tree).label().value()));
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
         }
         return new VerbPhrase(retList, tree.label().value());
     }
@@ -1089,7 +1096,7 @@ public class Main {
         for(Tree t: tree.getLeaves()) {
             log(String.valueOf(t.nodeNumber(t)));
             log(String.valueOf(t.nodeNumber(tree)));
-            retList.add(new Word(t.label().value(), t.parent(tree).label().value()));
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
         }
         return new NounPhrase(retList, tree.label().value());
     }
@@ -1098,7 +1105,7 @@ public class Main {
     {
         ArrayList<Word> retList = new ArrayList<Word>();
         for(Tree t: tree.getLeaves())
-            retList.add(new Word(t.label().value(), t.parent(tree).label().value()));
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
         return new ClauseX(retList, tree.label().value());
     }
 
@@ -1107,7 +1114,7 @@ public class Main {
         ArrayList<Word> retList = new ArrayList<Word>();
         for(Tree tree:t.getLeaves())
         {
-            retList.add(new Word(tree.label().value(), tree.parent(t).label().value()));
+            retList.add(new Word(tree.label().value(), tree.parent(t).label().value(), t.nodeNumber(tree)));
         }
         return retList;
     }
@@ -1117,7 +1124,7 @@ public class Main {
         ArrayList<GrammarRelation> retList = new ArrayList<GrammarRelation>();
         for(SemanticGraphEdge e:s.edgeListSorted())
         {
-            retList.add(new GrammarRelation(new Word(e.getGovernor().value(), e.getGovernor().tag()), new Word(e.getDependent().value(), e.getDependent().tag()), e.getRelation().toString()));
+            //retList.add(new GrammarRelation(new Word(e.getGovernor().value(), e.getGovernor().tag()), new Word(e.getDependent().value(), e.getDependent().tag()), e.getRelation().toString()));
             //System.out.println(e.getRelation().toString());
         }
         return retList;
@@ -1189,8 +1196,10 @@ public class Main {
                 ArrayList<GrammarRelation> relations = getRelationList(sg);
                 //sents.add(new Sentence(words, relations, c));
 
+                ArrayList<int[]> cs = getAllLeaves(constituencyParse);
                 ArrayList<NounPhrase> nps = getNounPhrases(constituencyParse);
                 ArrayList<VerbPhrase> vps = getVerbPhrases(constituencyParse);
+
 
 
 
@@ -2261,6 +2270,7 @@ class jmodel{
 class Word {
     public String word;
     public String gramClass;
+    public int LeafPos;
 
     Word()
     {
@@ -2268,10 +2278,11 @@ class Word {
         gramClass="";
     }
 
-    Word(String w, String g)
+    Word(String w, String g, int x)
     {
         word = w;
         gramClass = g;
+        LeafPos = x;
     }
 
     public String toString() {
