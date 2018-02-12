@@ -993,6 +993,36 @@ public class Main {
     }
 
 
+    static public ArrayList<Constituent> popConstituencyMap(Tree t)
+    {
+        ArrayList<Constituent> outp = new ArrayList<Constituent>();
+        int wc = 0;
+        int wx = 0;
+        for(Tree subTree: t) {
+            String type = subTree.label().value();
+
+            ArrayList<Word> wordz = new ArrayList<Word>();
+
+            if (subTree.label().value().equals("NP") & !subTree.label().value().equals("VP") & !subTree.label().value().equals("SBAR") & !subTree.label().value().equals("S") & !subTree.label().value().equals("ROOT")){
+                for (Tree tx : subTree.getLeaves()) {
+                    wx++;
+                }
+            }
+
+
+            if (subTree.label().value().equals("NP") | subTree.label().value().equals("VP")){
+                for (Tree tx : subTree.getLeaves()) {
+                    wc++;
+                    wordz.add(new Word(tx.label().value(), tx.parent(subTree).label().value(), tx.nodeNumber(subTree)));
+                    Word w = new Word(tx.label().value(), tx.parent(subTree).label().value(), tx.nodeNumber(subTree));
+                    Constituent c = new Constituent(w, type, wc+wx);
+                    outp.add(c);
+                }
+            }
+        }
+        return outp;
+    }
+
 
 
 
@@ -1015,6 +1045,20 @@ public class Main {
         return retList;
     }
 
+    static public ArrayList<int[]> getAllLeavesOfRoot(Tree tree)
+    {
+        ArrayList<int[]> retList = new ArrayList<int[]>();
+        int mainc = 0;
+        for(Tree t: tree.getLeaves()) {
+            mainc++;
+            int[] ti = new int[2];
+            ti[0]=t.nodeNumber(tree);
+            ti[1]=mainc;
+            retList.add(ti);
+        }
+        return retList;
+    }
+
     static public ArrayList<VerbPhrase> getVerbPhrases(Tree t)
     {
         ArrayList<VerbPhrase> retList = new ArrayList<VerbPhrase>();
@@ -1030,6 +1074,15 @@ public class Main {
             }
         }
         return retList;
+    }
+
+    static public VerbPhrase getVerbPhraseLeavesOfRoot(Tree tree)
+    {
+        ArrayList<Word> retList = new ArrayList<Word>();
+        for(Tree t: tree.getLeaves()) {
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
+        }
+        return new VerbPhrase(retList, tree.label().value());
     }
 
     static public ArrayList<NounPhrase> getNounPhrases(Tree t)
@@ -1049,6 +1102,18 @@ public class Main {
         return retList;
     }
 
+    static public NounPhrase getNounPhraseLeavesOfRoot(Tree tree)
+    {
+        ArrayList<Word> retList = new ArrayList<Word>();
+        for(Tree t: tree.getLeaves()) {
+            log(String.valueOf(t.nodeNumber(t)));
+            log(String.valueOf(t.nodeNumber(tree)));
+            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
+        }
+        return new NounPhrase(retList, tree.label().value());
+    }
+
+
     static public ArrayList<ClauseX> getClauses(Tree t)
     {
         ArrayList<ClauseX> retList = new ArrayList<ClauseX>();
@@ -1064,41 +1129,6 @@ public class Main {
             }
         }
         return retList;
-    }
-
-    static public ArrayList<int[]> getAllLeavesOfRoot(Tree tree)
-    {
-        ArrayList<int[]> retList = new ArrayList<int[]>();
-        int mainc = 0;
-        for(Tree t: tree.getLeaves()) {
-            mainc++;
-            int[] ti = new int[2];
-            ti[0]=t.nodeNumber(tree);
-            ti[1]=mainc;
-            retList.add(ti);
-        }
-        return retList;
-    }
-
-
-    static public VerbPhrase getVerbPhraseLeavesOfRoot(Tree tree)
-    {
-        ArrayList<Word> retList = new ArrayList<Word>();
-        for(Tree t: tree.getLeaves()) {
-            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
-        }
-        return new VerbPhrase(retList, tree.label().value());
-    }
-
-    static public NounPhrase getNounPhraseLeavesOfRoot(Tree tree)
-    {
-        ArrayList<Word> retList = new ArrayList<Word>();
-        for(Tree t: tree.getLeaves()) {
-            log(String.valueOf(t.nodeNumber(t)));
-            log(String.valueOf(t.nodeNumber(tree)));
-            retList.add(new Word(t.label().value(), t.parent(tree).label().value(), t.nodeNumber(tree)));
-        }
-        return new NounPhrase(retList, tree.label().value());
     }
 
     static public ClauseX getLeavesOfRoot(Tree tree)
@@ -1196,6 +1226,8 @@ public class Main {
                 ArrayList<GrammarRelation> relations = getRelationList(sg);
                 //sents.add(new Sentence(words, relations, c));
 
+
+                ArrayList<Constituent> outpx = popConstituencyMap(constituencyParse);
                 ArrayList<int[]> cs = getAllLeaves(constituencyParse);
                 ArrayList<NounPhrase> nps = getNounPhrases(constituencyParse);
                 ArrayList<VerbPhrase> vps = getVerbPhrases(constituencyParse);
@@ -2370,6 +2402,19 @@ class ClauseX {
     public ArrayList<Word> getWords()
     {
         return words;
+    }
+}
+
+
+class Constituent {
+    public Word word;
+    public String type;
+    public int pos;
+
+    Constituent(Word w, String t, int p) {
+        word = w;
+        type = t;
+        pos = p;
     }
 }
 
