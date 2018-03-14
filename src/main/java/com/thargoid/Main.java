@@ -1217,7 +1217,6 @@ public class Main {
                 // create lists of clauses and phrases
 
 
-
                 Tree constituencyParse = sentence.get(TreeCoreAnnotations.TreeAnnotation.class);
                 System.out.println("constituencyParse" + constituencyParse);
                 ArrayList<ClauseX> c = getClauses(constituencyParse);
@@ -1233,6 +1232,36 @@ public class Main {
                 ArrayList<VerbPhrase> vps = getVerbPhrases(constituencyParse);
 
 
+                List<Tree> leaves = constituencyParse.getLeaves();
+                List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
+
+                for (int l = 0; l < leaves.size(); ++l) {
+                    CoreLabel tokex = tokens.get(l);
+
+                    String word = tokex.get(CoreAnnotations.TextAnnotation.class);
+                    String pos = tokex.get(CoreAnnotations.PartOfSpeechAnnotation.class);
+                    String ne = tokex.get(CoreAnnotations.NamedEntityTagAnnotation.class);
+                    String lem = tokex.get(CoreAnnotations.LemmaAnnotation.class);
+                    log(leaves.get(l).toString() + ";" + tokex.toString() + ";" + word + ";" + pos + ";" + ne + ";" + lem);
+
+                    List<String[]> o = new ArrayList<>();
+                    Tree parents = leaves.get(l).parent(constituencyParse);
+                    while(parents!=constituencyParse){
+
+                        String e2 = parents.toString().substring(2,parents.toString().length()-2);
+                        String e3 = e2.substring(1,e2.indexOf("("));
+                        e2=e2.substring(e2.indexOf("("),e2.length());
+                        String[] e = new String[2];
+                        e[0] = e2;
+                        e[1] = e3;
+                        o.add(e);
+                        parents = parents.parent(constituencyParse);
+                        log("parents:" + parents);
+                    }
+
+
+                }
+
 
 
 
@@ -1243,7 +1272,6 @@ public class Main {
                     String pos = token.get(CoreAnnotations.PartOfSpeechAnnotation.class);
                     String ne = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
                     String lem = token.get(CoreAnnotations.LemmaAnnotation.class);
-
                     String postype = PartOfSpeechType(pos);
 
                     String[] indsx = new String[3];
